@@ -1,0 +1,35 @@
+     2: mumps
+     1: umfpack
+    40: bicgstab{2} + bilu0
+    41: bicgstab{2} + bilu1
+     4: bicgstab{2} + ilu0
+     7: bicgstab{2} + ilu1
+     1: bicgstab{2} + none
+    17: bicgstab{2} + vanka
+     5: bicgstab{4} + ilu0
+     8: bicgstab{4} + ilu1
+     2: bicgstab{4} + none
+     6: bicgstab + ilu0
+     9: bicgstab + ilu1
+     3: bicgstab + none
+    20: cg + ilu0
+    19: cg + none
+    18: cg + vanka
+     2: mumps
+     2: mumps
+     1: umfpack
+    40: bicgstab{2} + bilu0
+    41: bicgstab{2} + bilu1
+     4: bicgstab{2} + ilu0
+     7: bicgstab{2} + ilu1
+     1: bicgstab{2} + none
+    17: bicgstab{2} + vanka
+     5: bicgstab{4} + ilu0
+     8: bicgstab{4} + ilu1
+     2: bicgstab{4} + none
+     6: bicgstab + ilu0
+     9: bicgstab + ilu1
+     3: bicgstab + none
+    20: cg + ilu0
+    19: cg + none
+    18: cg + vanka

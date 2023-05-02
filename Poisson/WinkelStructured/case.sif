@@ -71,10 +71,19 @@ Solver 2
   Operator 1 = dofs
   Operator 2 = elements
   Operator 3 = partitions
-  Operator 4 = cpu time
+  Operator 4 = norm
+  Operator 5 = cpu time
 
   Expression 1 = Real $MeshLevels
-  Expression 2 = Real $LinMethod
+
+! Give a unique tag to each line/method
+  Line Marker = Integer $LinMethod$
+
+! We write a separate file showing how marker is mapped to string of the method
+  Comment = String $LinStr$
+
+! add the number of partitions to the filename
+!  Partition Numbering = Logical True
 
   File Append = True
   Parallel Reduce = True

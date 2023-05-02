@@ -1,0 +1,14 @@
+cg + vanka
+File started at: 2014/04/09 01:00:52
+Data is appended to existing file
+ 
+Variables in columns of matrix: holes10/poisson_1_1.dat
+   1: Line Marker
+   2: dofs: temperature
+   3: value: number of partitions
+   4: max: temperature
+   5: norm: temperature
+   6: res: linsys cpu time temperature
+   7: res: linsys real time temperature
+   8: res: solver cpu time heatsolver
+   9: res: solver real time heatsolver
