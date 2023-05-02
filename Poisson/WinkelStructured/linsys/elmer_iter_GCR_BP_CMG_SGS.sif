@@ -1,0 +1,76 @@
+$LinMethod = 44   
+$LinStr = "GCR + BP{CMG{10}}"
+
+
+! These choose the overall block strategies
+!-----------------------------------------
+  Linear System Solver = block
+  !Block Solver = Logical True
+  !Block Preconditioner = Logical True
+  Block Gauss-Seidel = Logical True
+  Block Matrix Reuse = Logical True
+
+! Linear system solver for outer loop
+!-----------------------------------------
+  Outer: Linear System Solver = string "Iterative"
+  Outer: Linear System Convergence Tolerance = real 1e-8
+  Outer: Linear System Iterative Method = string GCR
+  Outer: Linear System GCR Restart = Integer 50
+  Outer: Linear System Residual Output = integer 1
+  Outer: Linear System Max Iterations = integer 500
+  Outer: Linear System Timing = True
+
+! Linear system solver for blocks
+!-----------------------------------------
+  Block 11: Linear System Solver = multigrid
+  Block 22: Linear System Solver = multigrid	
+  Block 33: Linear System Solver = multigrid	
+  !Linear System Preconditioning = ILU0
+  Linear System Convergence Tolerance = 1.0e-05
+  Linear System Max Iterations = 50
+  Multigrid Levels = Integer 10
+
+!--- basic algebraic multigrid iteration stuff
+  MG Levels = Integer 10
+  MG Smoother = String sgs
+  MG Pre Smoothing Iterations(1) = 1
+  MG Post Smoothing Iterations(1) = 1
+ 
+!--- cluster MG specific parameters
+  MG Method = String cluster
+  MG Cluster Size = Integer 0
+  MG Cluster Alpha = Real 1.8
+  MG Strong Connection Limit = Real 0.01
+! MG Strong Connection Minimum = Integer 4
+  MG Max Iterations = Integer 2
+
+
+
+  Linear System Symmetric =  True
+
+  Linear System Solver = "Feti"
+  Total Feti = Logical True
+
+
+  Linear System Iterative Method = "CPG"
+
+! ways to set the singular values, also "spqr" possible
+! also 
+  Linear System Direct Method = "MumpsLocal"
+  Mumps Solve Singular = Logical True
+
+  Linear System Max Iterations = 1000
+  Linear System Convergence Tolerance = 1.0e-8
+  Linear System Abort Not Converged = True
+  Linear System Residual Output = 20
+  Linear System Preconditioning = None
+
+  Feti Preconditioning = Logical True ! default is True
+  Feti Projection Solution Group Size = Integer 10
+  Feti proj: Linear System Direct Method = Mumps
+
+! Associated only with not-1D cases
+!  Feti Kernel Rot-Trans = Logical True
+  Feti CPG Projection Iterative = Logical False
+
+  Skip Zero Rhs Test = Logical True

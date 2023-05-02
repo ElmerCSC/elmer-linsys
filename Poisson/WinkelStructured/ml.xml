@@ -1,0 +1,38 @@
+<ParameterList name="ML only settings"><!--{-->
+
+  <!-- no Krylov method - just apply preconditioner once -->
+  <Parameter name="Iterative Solver" type="string" value="None"/>
+     
+  <Parameter name="Preconditioner" type="string" value="ML"/>
+  
+  <!-- these can be used to find good ML parameters -->
+  <Parameter name="ML: Analyze Cycle" type="bool" value="0"/>
+  <Parameter name="ML: Test Smoothers" type="bool" value="0"/>
+    
+  <!-- parameters for the AMG solver ML -->
+  <ParameterList name="ML">
+    <!-- verbosity (0-10) -->
+    <Parameter name="ML output" type="int" value="0"/>
+    
+    <!-- number of unknowns per node -->
+    <Parameter name="PDE equations" type="int" value="1"/>
+
+    <!-- number of MG cycles -->
+    <Parameter name="cycle applications" type="int" value="2"/>
+
+    <!-- SA stands for 'smoothed aggregation', other options include -->
+    <!-- DD (two-level domain decomposition), DD-ML (3-level method),-->
+    <!-- NSSA (non-symmetric SA etc.                                 -->
+    <!--Parameter name="default values" type="string" value="SA"/-->
+    
+    <!-- smoother to be used: "Gauss-Seidel", "symmetric Gauss-Seidel", -->
+    <!-- "Aztec" (ILU as smoother), "Chebyshev" and many more           -->
+    <Parameter name="smoother: type" type="string" value="symmetric Gauss-Seidel"/>
+    <Parameter name="smoother: sweeps" type="int" value="1"/>
+    <Parameter name="smoother: pre or post" type="string" value="both"/>
+    
+    <!-- etc., we stick to the default values for this example -->
+
+  </ParameterList>
+
+</ParameterList><!--}-->

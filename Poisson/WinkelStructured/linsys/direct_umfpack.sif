@@ -1,0 +1,6 @@
+$LinMethod = 1   
+$LinStr = "umfpack"
+
+  Linear System Symmetric =  True
+  Linear System Solver = "Direct"
+  Linear System Direct Method = "Umfpack"

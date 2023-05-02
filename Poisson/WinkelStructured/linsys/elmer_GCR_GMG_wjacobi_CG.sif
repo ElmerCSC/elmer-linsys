@@ -1,0 +1,32 @@
+$LinMethod=23
+$LinStr = "GCR+GMG{wJacobi}+CG"
+
+  MG Post Smoothing Iterations = 15
+  MG Pre Smoothing iterations  = 0
+  MG Levels = $MeshLevels
+  MG Smoother=wjacobi
+  MG Smoother Relaxation Factor=Real 0.7
+
+  MG Sweeps=1
+  MG Max Iterations=5
+
+  MG lowest Linear Solver Iterative=True
+
+  Mglowest: Linear System Iterative Method = CG
+  Mglowest: Linear System Residual Output=0
+  Mglowest: Linear System Preconditioning=none
+  Mglowest: Linear System Abort Not Converged = False
+  Mglowest: Linear System Max Iterations = 500
+  Mglowest: Linear System Convergence Tolerance=1e-5
+
+! Linear System Scaling=False
+  Linear System Symmetric=True
+
+  Linear System Solver = "Iterative"
+
+  Linear System Convergence Tolerance = 1.0e-8
+  Linear System Abort Not Converged = True
+  Linear System Max Iterations = 50
+  Linear System Iterative Method = GCR
+  Linear System Residual Output = 1
+  Linear System Preconditioning = Multigrid

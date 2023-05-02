@@ -1,0 +1,30 @@
+  $LinMethod = 22  
+  $LinStr = "GMG{SGS}+BiCgStab{none}"
+
+!  Linear System Solver = iterative
+!  Linear System Iterative Method = gcr
+  Linear System Max Iterations = 1000
+  Linear System Convergence Tolerance = 1.0e-8
+  Linear System Abort Not Converged = True
+  Linear System Residual Output = 1 
+  Linear System Precondition Recompute = 1
+
+  Linear System Solver = multigrid
+!  Linear System Preconditioning = multigrid
+  MG Method = String "geometric"
+!  MG Equal Split = True
+  MG Smoother = sgs  
+  MG Pre Smoothing iterations = 1
+  MG Post Smoothing Iterations = 1
+  MG Levels = $ MeshLevels
+  
+  MG Lowest Linear Solver Iterative = Logical True
+  mglowest: Linear System Solver = Iterative
+  mglowest: Linear System Iterative Method = bicgstab
+  mglowest: Linear System Max Iterations = 100
+  mglowest: Linear System Convergence Tolerance = 1.0e-5
+  mglowest: Linear System Abort Not Converged = False
+  mglowest: Linear System Residual Output = 20
+  mglowest: Linear System Preconditioning = none
+!  mglowest: Linear System Precondition Recompute = 1
+ 
