@@ -29,14 +29,25 @@ colors = iter(mcolors.TABLEAU_COLORS.keys())
 plt.figure()
 
 
+# Function for manually going through the dat_file.marker file containing the solver names as splitting
+# it directly with ':' as separator might not work as the solvers name also contains it
+def read_markers(dat_file):
+    filename = f"{dat_file}.marker"
+    solvers = []
+    with open(filename) as file:
+        for line in file:
+            solvers.append(line.strip().split(': ', 1)[1])
+
+    return solvers
+
+
 def read_and_plot(dat_file):
     data = pd.read_table(dat_file, delim_whitespace=True, header=None)
-    markers = pd.read_table(f"{dat_file}.marker", sep=':', header=None)
 
-    solver = markers[1].values.tolist()
+    solvers = read_markers(dat_file)
 
     data.columns = columns
-    data['Solver'] = solver
+    data['Solver'] = solvers
 
     # Drop the row if the solver failed
     data = data[data['norm'] != 0.0]
