@@ -9,7 +9,6 @@ import sys
 
 
 # Change directory to WinkelStructured/results to access the .dat files
-print(os.getcwd())
 cwd_arr = os.getcwd().split('/')
 cwd_arr[-1] = "WinkelStructured/results"
 os.chdir('/'.join(cwd_arr))
