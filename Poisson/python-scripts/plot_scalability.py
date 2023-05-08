@@ -1,6 +1,12 @@
 """
-Basic Python script that plots the execution times for given linear solvers as a function of the number of elements and fits an exponential to it
+Basic Python script that plots the execution times for given linear solvers as a function of the number of elements and fits an exponential to them
+
+Usage is: 
+    python3 plot_scalability.py   // When using predefined values
+    python3 plot_scalability.py "file1" "file2" ...  // When using predefined path, but given files
+    python3 plot_scalability.py "file1" "file2" ... -p "path"  // When using given path and files
 """
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,13 +14,9 @@ import matplotlib.colors as mcolors
 import os
 import sys
 import warnings
+import argparse
 from scipy.optimize import curve_fit
 
-
-# Change directory to WinkelStructured/results to access the .dat files
-cwd_arr = os.getcwd().split('/')
-cwd_arr[-1] = "WinkelStructured/results"
-os.chdir('/'.join(cwd_arr))
 
 columns = ["Line Marker", "dofs", "elements", "partitions", "norm", "total CPU time (s)",
            "simulation CPU time (s)", "simulation real time (s)", "linsys CPU time (s)",
@@ -27,6 +29,20 @@ colors = iter(mcolors.TABLEAU_COLORS.keys())
 
 # Initialize the figure in global scope
 plt.figure()
+
+
+################# PREDEFINED ####################
+
+# Predefined .dat files that the code will look for if nothing is passed as argument
+dat_files = ["f2.dat"]
+
+# Change directory to predefined location from where the results can be read
+# (in this case WinkelStructed/results)
+cwd_arr = os.getcwd().split('/')
+cwd_arr[-1] = "WinkelStructured/results"
+os.chdir('/'.join(cwd_arr))
+
+#################################################
 
 
 # Function for manually going through the dat_file.marker file containing the solver names as splitting
@@ -76,11 +92,20 @@ def read_and_plot(dat_file):
 
 
 def main():
+    # Python generally understands the global scope here without special declaration, but it is added just to be sure
+    global dat_files  
+    
     if len(sys.argv) > 1:
-        dat_files = sys.argv[1:]
-    else:
-        # Predefined value. Will be overwritten by passed command line args
-        dat_files = ["f2.dat"]
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-p', '--path', type=str)
+        parser.add_argument('files', nargs='*', type=str)
+        args = parser.parse_args()
+
+        if args.path is not None:
+            os.chdir(args.path)
+
+        if args.files is not None:
+            dat_files = args.files      
 
     for dat_file in dat_files:
         read_and_plot(dat_file)

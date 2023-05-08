@@ -1,17 +1,19 @@
 """
 Basic Python script that plots the execution times of all solvers with a given mesh level
+
+Usage is: 
+    python3 plot_times.py   // When using predefined values
+    python3 plot_times.py "file"  // When using predefined path, but given file
+    python3 plot_times.py "file" -p "path"  // When using given path and file
 """
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import sys
+import argparse
 
-
-# Change directory to WinkelStructured/results to access the .dat files
-cwd_arr = os.getcwd().split('/')
-cwd_arr[-1] = "WinkelStructured/results"
-os.chdir('/'.join(cwd_arr))
 
 columns = ["Line Marker", "dofs", "elements", "partitions", "norm", "total CPU time (s)",
            "simulation CPU time (s)", "simulation real time (s)", "linsys CPU time (s)",
@@ -19,6 +21,20 @@ columns = ["Line Marker", "dofs", "elements", "partitions", "norm", "total CPU t
            "MeshLevel"]
 
 use_time = "linsys CPU time (s)"  # Must be listed in columns
+
+
+################# PREDEFINED ####################
+
+# Predefined .dat files that the code will look for if nothing is passed as argument
+dat_filename = "f.dat"
+
+# Change directory to predefined location from where the results can be read
+# (in this case WinkelStructed/results)
+cwd_arr = os.getcwd().split('/')
+cwd_arr[-1] = "WinkelStructured/results"
+os.chdir('/'.join(cwd_arr))
+
+#################################################
 
 
 # Function for manually going through the dat_file.marker file containing the solver names as splitting
@@ -34,15 +50,23 @@ def read_markers(dat_file):
 
 
 def main():
+    global dat_filename  # Python isn't smart enough so this needs to be declared
+    
     if len(sys.argv) > 1:
-        dat_file = sys.argv[1]
-    else:
-        # Predefined value. Will be overwritten by passed command line arg
-        dat_file = "f.dat"
-        
-    data = pd.read_table(dat_file, delim_whitespace=True, header=None)
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-p', '--path', type=str)
+        parser.add_argument('dat_file', type=str)
+        args = parser.parse_args()
 
-    solvers = read_markers(dat_file)
+        if args.path is not None:
+            os.chdir(args.path)
+
+        if args.dat_file is not None:
+            dat_filename = args.dat_file
+        
+    data = pd.read_table(dat_filename, delim_whitespace=True, header=None)
+
+    solvers = read_markers(dat_filename)
 
     data.columns = columns
     data['Solver'] = solvers
