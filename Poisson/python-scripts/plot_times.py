@@ -1,5 +1,6 @@
 """
 Basic Python script that plots the execution times of all solvers with a given mesh level
+If the file contains data for multiple mesh levels plots only the most common one
 
 Usage is: 
     python3 plot_times.py   // When using predefined values
@@ -65,7 +66,6 @@ def main():
             dat_filename = args.dat_file
         
     data = pd.read_table(dat_filename, delim_whitespace=True, header=None)
-
     solvers = read_markers(dat_filename)
 
     data.columns = columns
@@ -73,6 +73,10 @@ def main():
 
     # Drop the row if the solver failed
     data = data[data['norm'] != 0.0]
+
+    # Find the most common mesh level value and drop all rows with different mesh level
+    mesh_level = data['MeshLevel'].mode()[0]
+    data = data[data['MeshLevel'] == mesh_level]
 
     data.sort_values(by=[use_time], ascending=True, inplace=True)
 
@@ -85,7 +89,7 @@ def main():
     ax.bar_label(bars)
     ax.set_ylabel("Solver")
     ax.set_xlabel(use_time)
-    ax.set_title(f"Solver runtimes with Mesh Level: {int(data['MeshLevel'][0])}")
+    ax.set_title(f"Solver runtimes with Mesh Level: {int(mesh_level)} ({data['partitions'][0]} partitions)")
 
     plt.show()
 
