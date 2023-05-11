@@ -69,22 +69,22 @@ def read_and_plot(dat_file):
     data = data[data['norm'] != 0.0]
 
     times = data[use_time].values.tolist()
-    elements = data['elements'].values.tolist()
+    dofs = data['dofs'].values / 1_000_000  # Unit should be 1M dofs
 
     # Fit an exponential to the given datapoints
     curve_found = False
     try:
-        popt, pcov = curve_fit(lambda n, a, b: a * n ** b, elements, times)
+        popt, pcov = curve_fit(lambda n, a, b: a * n ** b, dofs, times)
     except RuntimeError:
         warnings.warn("Could not fit a curve to the datapoints. Plotting just the points.", RuntimeWarning)
     else:
-        x = np.linspace(np.min(elements), np.max(elements), 100)
+        x = np.linspace(np.min(dofs), np.max(dofs), 100)
         y = popt[0] * x ** popt[1]
         curve_found = True
 
     color = next(colors)
 
-    plt.loglog(elements, times, color=color, marker='o', linestyle='None', mfc='none', alpha=0.7,
+    plt.loglog(dofs, times, color=color, marker='o', linestyle='None', mfc='none', alpha=0.7,
                label=f"Datapoints for solver: {data['Solver'][0]}")
     if curve_found:
         plt.loglog(x, y, color=color, alpha=0.5,
@@ -111,7 +111,7 @@ def main():
         read_and_plot(dat_file)
         
     plt.ylabel(use_time)
-    plt.xlabel("#Elements = $n$")
+    plt.xlabel("#dofs (in millions) = $n$")
     plt.legend()
     plt.show()
     
