@@ -1,4 +1,4 @@
-  $LinMethod = 19  
+  $LinMethod = 207000000
   $LinStr = "CG + none"
 
   Linear System Solver = Iterative

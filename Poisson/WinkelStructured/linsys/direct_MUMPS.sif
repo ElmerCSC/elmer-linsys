@@ -1,4 +1,4 @@
-$LinMethod = 2   
+$LinMethod = 101000000  
 $LinStr = "MUMPS"
 
   Linear System Symmetric =  True

@@ -1,4 +1,4 @@
-$LinMethod = 30  
+$LinMethod = 310080000
 $LinStr = "Hypre: GMRes + Parasails"
 
 Linear System Use Hypre = Logical True

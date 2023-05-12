@@ -1,4 +1,4 @@
-$LinMethod = 42  
+$LinMethod = 413000000
 $LinStr = "Trilinos: CH + ML{SGS,dof-3}"
 
   Linear System Solver = Iterative

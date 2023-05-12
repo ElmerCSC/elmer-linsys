@@ -1,4 +1,4 @@
-  $LinMethod = 17  
+  $LinMethod = 206260000
   $LinStr = "BiCgStab{2} + vanka"
 
   Linear System Solver = Iterative

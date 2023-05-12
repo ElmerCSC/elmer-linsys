@@ -1,4 +1,4 @@
-$LinMethod = 15  
+$LinMethod = 308000000
 $LinStr = "Hypre: boomeramg"
 
 Linear System Use Hypre = Logical True

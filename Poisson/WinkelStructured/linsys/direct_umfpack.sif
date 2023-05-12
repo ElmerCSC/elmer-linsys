@@ -1,4 +1,4 @@
-$LinMethod = 1   
+$LinMethod = 102000000
 $LinStr = "umfpack"
 
   Linear System Symmetric =  True

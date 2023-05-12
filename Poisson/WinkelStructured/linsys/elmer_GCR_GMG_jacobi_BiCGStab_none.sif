@@ -1,4 +1,4 @@
-  $LinMethod = 21  
+  $LinMethod = 204020030
   $LinStr = "GCR+GMG{Jacobi}+BiCgStab{none}"
 
   Linear System Solver = Iterative
