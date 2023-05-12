@@ -38,10 +38,13 @@ Solvers/iterative methods:
     CG = 07
     BoomerAMG = 08
     FlexGmres = 09
-    GMRes = 10
+    GMRes = 10  // Also for Gmres
     LGMRes = 11
     ml_sgs = 12
     ml_sgs_dof3 = 13
+    Idrs = 14
+    Tfqmr = 15
+    
 ----------------------------------------------------------
 
 ----------------------------------------------------------
