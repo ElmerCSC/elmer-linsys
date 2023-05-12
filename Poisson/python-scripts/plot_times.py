@@ -2,10 +2,14 @@
 Basic Python script that plots the execution times of all solvers with a given mesh level
 If the file contains data for multiple mesh levels plots only the most common one
 
-Usage is: 
-    python3 plot_times.py   // When using predefined values
-    python3 plot_times.py "file"  // When using predefined path, but given file
-    python3 plot_times.py "file" -p "path"  // When using given path and file
+This script has four optional passable cmd args
+   1. -f (--file) for using a different file than the one predefined
+   2. -p (--path) for using a different path than the one predefined
+   3. -t (--total_time) for plotting the total time as well (passed value should be "yes")
+   4. -m (--mesh_level) for choosing the wanted mesh level if selected file contains multiple
+
+Note it is not recommended to plot total times as well if file contains results for a large number of solvers
+as the figure will get very crowded
 """
 
 import numpy as np
@@ -35,6 +39,8 @@ cwd_arr = os.getcwd().split('/')
 cwd_arr[-1] = "WinkelStructured/results"
 os.chdir('/'.join(cwd_arr))
 
+plot_total_time = False
+
 #################################################
 
 
@@ -52,18 +58,28 @@ def read_markers(dat_file):
 
 def main():
     global dat_filename  # Python isn't smart enough so this needs to be declared
+    global plot_total_time
+    mesh_level = None
     
     if len(sys.argv) > 1:
         parser = argparse.ArgumentParser()
         parser.add_argument('-p', '--path', type=str)
-        parser.add_argument('dat_file', type=str)
+        parser.add_argument('-t', '--total_time', type=str)
+        parser.add_argument('-f', '--file', type=str)
+        parser.add_argument('-m', '--mesh_level', type=int)
         args = parser.parse_args()
 
         if args.path is not None:
             os.chdir(args.path)
 
-        if args.dat_file is not None:
-            dat_filename = args.dat_file
+        if args.total_time is not None:
+            if args.total_time.lower() == 'yes':
+                plot_total_time = True
+
+        if args.file is not None:
+            dat_filename = args.file
+
+        mesh_level = args.mesh_level
         
     data = pd.read_table(dat_filename, delim_whitespace=True, header=None)
     solvers = read_markers(dat_filename)
@@ -75,22 +91,39 @@ def main():
     data = data[data['norm'] != 0.0]
 
     # Find the most common mesh level value and drop all rows with different mesh level
-    mesh_level = data['MeshLevel'].mode()[0]
-    data = data[data['MeshLevel'] == mesh_level]
+    # if no chosen mesh level was passed
+    if mesh_level is None:
+        mesh_level = data['MeshLevel'].mode()[0]
+        
+    data = data[data['MeshLevel'] == float(mesh_level)]
 
     data.sort_values(by=[use_time], ascending=True, inplace=True)
 
-    times = data[use_time].values.tolist()
+    use_times = data[use_time].values
+    total_times = data['total CPU time (s)'].values
     solvers = data['Solver'].values.tolist()
+
+    y_axis = np.linspace(0, len(solvers), len(solvers))
 
     # Plot the times as a barplot
     fig, ax = plt.subplots()
-    bars = ax.barh(solvers, times)
-    ax.bar_label(bars)
-    ax.set_ylabel("Solver")
-    ax.set_xlabel(use_time)
-    ax.set_title(f"Solver runtimes with Mesh Level: {int(mesh_level)} ({data['partitions'][0]} partitions)")
 
+    if plot_total_time:
+        total_time_bars = ax.barh(y_axis + 0.2, total_times, 0.4, label='total CPU time (s)')
+        use_time_bars = ax.barh(y_axis - 0.2, use_times, 0.4, label=use_time)
+        ax.bar_label(use_time_bars)
+        ax.bar_label(total_time_bars)
+
+    else:
+        use_time_bars = ax.barh(y_axis, use_times, label=use_time)
+        ax.bar_label(use_time_bars)
+
+    ax.set_yticks(y_axis, solvers)
+    ax.set_ylabel("Solver")
+    ax.set_xlabel("Time (s)")
+    ax.set_title(f"Solver runtimes with Mesh Level: {int(mesh_level)} ({data['partitions'].iloc[0]} partitions)")
+    ax.legend(loc='lower right')
+    
     plt.show()
 
 
