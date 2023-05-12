@@ -6,9 +6,16 @@ Identifier consists of four main parts:
    3. preconditioner  (one digit)
    4. preconditioners solver (if such is needed)  (two digits)
 
-Additionally, there are three additional values mixed in that dictate the parameter value passed to either the solver or preconditioner (one digit each). So let a be the developer id, b the solver id, c the preconditioner id, d the preconditioner solver id, and n, m, k the passed parameters (0 signifies both no parameter passed (if such is not needed) and 0 passed). Then the combined id would be "abncmdk" (so the numbers written one after another not multiplied)
+Additionally, there are three additional values mixed in that dictate the parameter
+value passed to either the solver or preconditioner (one digit each). So let a be the
+developer id, b the solver id, c the preconditioner id, d the preconditioner solver id,
+and n, m, k the passed parameters (0 signifies both no parameter passed (if such is not
+needed) and 0 passed). Then the combined id would be "abncmdk" (so the numbers written
+one after another not multiplied).
 
-Limitations to how many digits are used to identify each part come from the fact that (32 bit) integers can have at most 10 digits and to avoid overflow it would be safer to limit total number of digits to 9
+Limitations to how many digits are used to identify each part come from the fact that
+(32 bit) integers can have at most 10 digits and to avoid overflow it would be safer to
+limit total number of digits to 9.
 
 ----------------------------------------------------------
 Developers:
