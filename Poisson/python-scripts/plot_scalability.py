@@ -3,8 +3,8 @@ Basic Python script that plots the execution times for given linear solvers as a
 
 Usage is: 
     python3 plot_scalability.py   // When using predefined values
-    python3 plot_scalability.py "file1" "file2" ...  // When using predefined path, but given files
-    python3 plot_scalability.py "file1" "file2" ... -p "path"  // When using given path and files
+    python3 plot_scalability.py -f "file1" "file2" ...  // When using predefined path, but given files
+    python3 plot_scalability.py -f "file1" "file2" ... -p "path"  // When using given path and files
 """
 
 import numpy as np
@@ -65,8 +65,15 @@ def read_and_plot(dat_file):
     data.columns = columns
     data['Solver'] = solvers
 
-    # Drop the row if the solver failed
-    data = data[data['norm'] != 0.0]
+    # Drop the solver if it failed with any mesh level
+    # This is relatively poor way of evaluating the correctness
+    # of the solution and should be rewritten
+    median = np.median(data['norm'].values)
+    data = data[np.isclose(data['norm'], median, atol=0.1)]
+
+    if len(data) != len(solvers):
+        print(f"WARNING: Solver {solvers[0]} had incorrect solution")
+        return
 
     times = data[use_time].values.tolist()
     dofs = data['dofs'].values / 1_000_000  # Unit should be 1M dofs
@@ -76,7 +83,7 @@ def read_and_plot(dat_file):
     try:
         popt, pcov = curve_fit(lambda n, a, b: a * n ** b, dofs, times)
     except RuntimeError:
-        warnings.warn("Could not fit a curve to the datapoints. Plotting just the points.", RuntimeWarning)
+       print(f"WARNING: Could not fit a curve to the datapoints of solver {solvers[0]}. Plotting just the points.")
     else:
         x = np.linspace(np.min(dofs), np.max(dofs), 100)
         y = popt[0] * x ** popt[1]
@@ -86,6 +93,7 @@ def read_and_plot(dat_file):
 
     plt.loglog(dofs, times, color=color, marker='o', linestyle='None', mfc='none', alpha=0.7,
                label=f"Datapoints for solver: {data['Solver'][0]}")
+    
     if curve_found:
         plt.loglog(x, y, color=color, alpha=0.5,
                    label=f"Found exponential: $({popt[0]:.2e}) \cdot n ^ {{{popt[1]:.2e}}}$")
@@ -98,7 +106,7 @@ def main():
     if len(sys.argv) > 1:
         parser = argparse.ArgumentParser()
         parser.add_argument('-p', '--path', type=str)
-        parser.add_argument('files', nargs='*', type=str)
+        parser.add_argument('-f', '--files', nargs='*', type=str)
         args = parser.parse_args()
 
         if args.path is not None:

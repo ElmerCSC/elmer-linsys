@@ -15,6 +15,7 @@ as the figure will get very crowded
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import warnings
 import os
 import sys
 import argparse
@@ -87,15 +88,23 @@ def main():
     data.columns = columns
     data['Solver'] = solvers
 
-    # Drop the row if the solver failed
-    data = data[data['norm'] != 0.0]
-
     # Find the most common mesh level value and drop all rows with different mesh level
     # if no chosen mesh level was passed
     if mesh_level is None:
         mesh_level = data['MeshLevel'].mode()[0]
-        
+
     data = data[data['MeshLevel'] == float(mesh_level)]
+
+    solvers = data['Solver'].values.tolist()
+    n_solvers = len(solvers)
+
+    # Find the median of the norm values and remove the rows where the
+    # norm varies significantly
+    median = np.median(data['norm'].values)  # Might need to be changed to mode if floating point error can be handled
+    data = data[np.isclose(data['norm'], median, atol=10 ** (-6))]
+
+    if len(data) != n_solvers:
+        print(f"WARNING: Solvers: {', '.join(list(set(solvers).difference(set(data['Solver'].values.tolist()))))} had incorrect solution")
 
     data.sort_values(by=[use_time], ascending=True, inplace=True)
 
