@@ -39,7 +39,7 @@ dat_files = ["f2.dat"]
 # Change directory to predefined location from where the results can be read
 # (in this case WinkelStructed/results)
 cwd_arr = os.getcwd().split('/')
-cwd_arr[-1] = "WinkelStructured/results"
+cwd_arr[-1] = "Poisson/WinkelStructured/results"
 os.chdir('/'.join(cwd_arr))
 
 #################################################

@@ -1,7 +1,5 @@
 ! Heat equation of "winkel" geometry with different linear system stratgies.
 
-$MeshLevels=3
-
 Header
   CHECK KEYWORDS Warn
   Mesh DB "." "winkel"
@@ -10,14 +8,14 @@ Header
 End
 
 Simulation
-  Max Output Level = 5
+  Max Output Level = 3
 
   Coordinate System = "Cartesian"
   Simulation Type = "Steady State"
   Steady State Max Iterations = 1
   Output Intervals = 1
 
-  Mesh Levels = $MeshLevels
+  Mesh Levels = $ipar(0)
 
   Simulation Timing = Logical True
   Post File = "case.vtu"
@@ -74,7 +72,7 @@ Solver 2
   Operator 4 = norm
   Operator 5 = cpu time
 
-  Expression 1 = Real $MeshLevels
+  Expression 1 = Real $ipar(0)
 
 ! Give a unique tag to each line/method
   Line Marker = Integer $LinMethod$
