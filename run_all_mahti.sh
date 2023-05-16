@@ -14,6 +14,9 @@ module load elmer/latest
 # Define the path to the case folder
 path=Poisson/WinkelStructured
 
+# Define the problem type
+problem=Poisson
+
 # Uncomment this if you don't want to append to existing results
 # rm -f $path/results/f.*
 
@@ -24,28 +27,37 @@ for mesh_level in 3 4 5; do
 
     for solver in linsys/*.sif; do
 
-        cp $solver $path/linsys.sif
-        cd $path
+	if grep -Fxq "$solver" solver-lists/$problem-Solvers.txt
+	then
 
-        start=$(date +%s)
+            cp $solver $path/linsys.sif
+            cd $path
 
-        echo
-        echo
-        echo "-----------------------------------"
-        echo "Starting $solver with mesh level $mesh_level"
-        echo
+            start=$(date +%s)
+
+            echo
+            echo
+            echo "-----------------------------------"
+            echo "Starting $solver with mesh level $mesh_level"
+            echo
     
-        srun ElmerSolver case.sif -ipar 1 $mesh_level
+            srun ElmerSolver case.sif -ipar 1 $mesh_level
 
-        end=$(date +%s)
+            end=$(date +%s)
 
-        echo
-        echo "Ending $solver with mesh level $mesh_level"
-        echo "Elapsed time: $(($end-$start)) s"
-        echo "-----------------------------------"
-        echo
+            echo
+            echo "Ending $solver with mesh level $mesh_level"
+            echo "Elapsed time: $(($end-$start)) s"
+            echo "-----------------------------------"
+            echo
 
-	cd ../..
+	    cd ../..
+
+	else
+	    echo
+	    echo "Solver $solver not recommended for given problem. Ignoring it"
+	    echo
+	fi
     
    done
 

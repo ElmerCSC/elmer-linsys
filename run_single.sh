@@ -3,9 +3,21 @@
 # Define the path to the case folder
 path=Poisson/WinkelStructured
 
+# Define the problem type
+problem=Poisson
+
 # Define here the solver to be used
-solver=linsys/elmer_iter_Gmres_ILU0.sif
+solver=linsys/trilinos_ml_sgs.sif
 # linMarker=??????
+
+if ! grep -Fxq "$solver" solver-lists/$problem-Solvers.txt
+then   
+    echo
+    echo "Solver $solver not recommended for given problem. Exiting"
+    echo
+    return
+fi
+
 
 # Remove the result files if they already exist
 # rm -f $path/results/f$linMarker.*

@@ -3,38 +3,50 @@
 # Define the path to the case folder
 path=Poisson/WinkelStructured
 
+# Define the problem type
+problem=Poisson
+
 # Remove the result files if they already exist
 rm -f $path/results/f.*
 
 # Copy the valid case file into the case folder
 cp case_all.sif $path/case.sif
 
-for mesh_level in 2 3 4; do
+for mesh_level in 2; do
 
     for solver in linsys/*.sif; do
 
-	cp $solver $path/linsys.sif
-        cd $path
+	if grep -Fxq "$solver" solver-lists/$problem-Solvers.txt
+	then
 
-        echo 
-        echo 
-	echo "-----------------------------------"
-        echo "Starting $solver with mesh level $mesh_level"
-        echo
+	    cp $solver $path/linsys.sif
+            cd $path
 
-        start=$(date +%s)
+            echo 
+            echo 
+	    echo "-----------------------------------"
+            echo "Starting $solver with mesh level $mesh_level"
+            echo
+
+            start=$(date +%s)
     
-        mpirun -np 4 ElmerSolver case.sif -ipar 1 $mesh_level
+            mpirun -np 4 ElmerSolver case.sif -ipar 1 $mesh_level
 
-        end=$(date +%s)
+            end=$(date +%s)
 
-	echo
-        echo "Ending $solver with mesh level $mesh_level"
-        echo "Elapsed time: $(($end-$start)) s"
-        echo "-----------------------------------"
-        echo
+   	    echo
+            echo "Ending $solver with mesh level $mesh_level"
+            echo "Elapsed time: $(($end-$start)) s"
+            echo "-----------------------------------"
+            echo
 
-	cd ../..
+	    cd ../..
+
+	else
+	    echo
+	    echo "Solver $solver not recommended for given problem. Ignoring it"
+	    echo
+	fi
 
     done
     

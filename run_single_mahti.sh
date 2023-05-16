@@ -14,6 +14,17 @@ module load elmer/latest
 # Define the path to the case folder
 path=Poisson/WinkelStructured
 
+# Define the problem type
+problem=Poisson
+
+if ! grep -Fxq "$solver" solver-lists/$problem-Solvers.txt
+then   
+    echo
+    echo "Solver $solver not recommended for given problem. Exiting"
+    echo
+    return
+fi
+
 # Declare here which solver is to be used
 solver=linsys/elmer_iter_BiCGStab2_BILU0.sif
 # linMarker=??????
