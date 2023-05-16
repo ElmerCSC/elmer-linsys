@@ -23,21 +23,18 @@ solver=linsys/elmer_iter_BiCGStab2_BILU0.sif
 
 # Copy the valid case file into the case folder
 cp case_all.sif $path/case.sif
-
-cp $solver linsys.sif
+cp $solver $path/linsys.sif
+cd $path
 
 for i in 1 2 3 4 5 6 7; do
-
-    cp $solver $path/linsys.sif
-    cd $path
-
-    start=$(date +%s)
 
     echo
     echo
     echo "-----------------------------------"
     echo "Starting $solver with mesh level $i"
     echo
+
+    start=$(date +%s)
     
     srun ElmerSolver case.sif -ipar 1 $i
 
@@ -48,7 +45,7 @@ for i in 1 2 3 4 5 6 7; do
     echo "Elapsed time: $(($end-$start)) s"
     echo "-----------------------------------"
     echo
-
-    cd ../..
-    
+   
 done
+
+cd ../.. 

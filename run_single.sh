@@ -10,8 +10,10 @@ solver=linsys/elmer_iter_Gmres_ILU0.sif
 # Remove the result files if they already exist
 # rm -f $path/results/f$linMarker.*
 
-# Copy the valid case file into the case folder
+# Copy the valid case and solver file into the case folder
 cp case_single.sif $path/case.sif
+cp $solver $path/linsys.sif
+cd $path
 
 for mesh_level in 2 3 4; do
 	
@@ -21,9 +23,6 @@ for mesh_level in 2 3 4; do
    echo "Starting $solver with mesh level $mesh_level"
    echo
 	
-   cp $solver $path/linsys.sif
-   cd $path
-
    start=$(date +%s)
     
    mpirun -np 4 ElmerSolver case.sif -ipar 1 $mesh_level
@@ -35,7 +34,7 @@ for mesh_level in 2 3 4; do
    echo "Elapsed time: $(($end-$start)) s"
    echo "-----------------------------------"
    echo
-
-   cd ../..
    
 done
+
+cd ../..
