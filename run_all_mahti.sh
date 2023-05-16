@@ -20,8 +20,8 @@ problem=Poisson
 # Uncomment this if you don't want to append to existing results
 # rm -f $path/results/f.*
 
-# Copy the valid case file into the case folder
-cp case_all.sif $path/case.sif
+# Copy the valid case file into the case.sif file
+cp $path/case_all.sif $path/case.sif
 
 for mesh_level in 3 4 5; do
 

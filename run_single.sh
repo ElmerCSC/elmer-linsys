@@ -22,8 +22,8 @@ fi
 # Remove the result files if they already exist
 # rm -f $path/results/f$linMarker.*
 
-# Copy the valid case and solver file into the case folder
-cp case_single.sif $path/case.sif
+# Copy the valid case and solver file into the case.sif file
+cp $path/case_single.sif $path/case.sif
 cp $solver $path/linsys.sif
 cd $path
 

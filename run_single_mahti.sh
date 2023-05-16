@@ -32,8 +32,8 @@ solver=linsys/elmer_iter_BiCGStab2_BILU0.sif
 # Remove the result files if they already exist
 # rm -f $path/results/f$linMarker.*
 
-# Copy the valid case file into the case folder
-cp case_all.sif $path/case.sif
+# Copy the valid case file into the case.sif file
+cp $path/case_all.sif $path/case.sif
 cp $solver $path/linsys.sif
 cd $path
 

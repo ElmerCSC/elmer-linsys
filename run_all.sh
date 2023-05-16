@@ -9,8 +9,8 @@ problem=Poisson
 # Remove the result files if they already exist
 rm -f $path/results/f.*
 
-# Copy the valid case file into the case folder
-cp case_all.sif $path/case.sif
+# Copy the valid case file into the case.sif file
+cp $path/case_all.sif $path/case.sif
 
 for mesh_level in 2; do
 
