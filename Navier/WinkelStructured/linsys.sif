@@ -1,0 +1,6 @@
+$LinMethod = 101000000  
+$LinStr = "MUMPS"
+
+  Linear System Symmetric =  True
+  Linear System Solver = "Direct"
+  Linear System Direct Method = "MUMPS"
