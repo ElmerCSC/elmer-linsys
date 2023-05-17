@@ -129,7 +129,7 @@ def main():
     ax.bar_label(bars)
     ax.set_ylabel("Solver")
     ax.set_xlabel(f"$b$ solved from: $t = a \cdot  n ^ b$")
-    ax.set_title(f"Scaling coefficients ({data['partitions'][0]} partitions)")
+    ax.set_title(f"Scaling coefs for {'-'.join(os.getcwd().split('/')[-3:-1])} ({data['partitions'][0]} partitions)")
 
     plt.show()
 

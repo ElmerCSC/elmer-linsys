@@ -117,7 +117,9 @@ def main():
 
     for dat_file in dat_files:
         read_and_plot(dat_file)
-        
+
+
+    plt.title(f"{'-'.join(os.getcwd().split('/')[-3:-1])}")
     plt.ylabel(use_time)
     plt.xlabel("#dofs (in millions) = $n$")
     plt.legend()

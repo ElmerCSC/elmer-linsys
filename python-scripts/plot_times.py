@@ -37,7 +37,7 @@ dat_filename = "f.dat"
 # Change directory to predefined location from where the results can be read
 # (in this case WinkelStructed/results)
 cwd_arr = os.getcwd().split('/')
-cwd_arr[-1] = "Poisson/WinkelStructured/results"
+cwd_arr[-1] = "Poisson/WinkelUnstructured/results"
 os.chdir('/'.join(cwd_arr))
 
 plot_total_time = False
@@ -130,7 +130,7 @@ def main():
     ax.set_yticks(y_axis, solvers)
     ax.set_ylabel("Solver")
     ax.set_xlabel("Time (s)")
-    ax.set_title(f"Solver runtimes with Mesh Level: {int(mesh_level)} ({data['partitions'].iloc[0]} partitions)")
+    ax.set_title(f"Runtimes for {'-'.join(os.getcwd().split('/')[-3:-1])} with Mesh Level: {int(mesh_level)} ({data['partitions'].iloc[0]} partitions)")
     ax.legend(loc='lower right')
     
     plt.show()
