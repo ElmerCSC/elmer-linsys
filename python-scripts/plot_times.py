@@ -5,7 +5,7 @@ If the file contains data for multiple mesh levels plots only the most common on
 This script has four optional passable cmd args
    1. -f (--file) for using a different file than the one predefined
    2. -p (--path) for using a different path than the one predefined
-   3. -t (--total_time) for plotting the total time as well (passed value should be "yes")
+   3. -t (--total_time) for plotting the total time as well (the flag is enough)
    4. -m (--mesh_level) for choosing the wanted mesh level if selected file contains multiple
 
 Note it is not recommended to plot total times as well if file contains results for a large number of solvers
@@ -45,6 +45,23 @@ plot_total_time = False
 #################################################
 
 
+# Function for computing the mode of a list of floating point values with a given tolerance
+def float_mode(vals, tol=10 ** (-6)):
+    count = -1
+    mode = -1
+    while len(vals) > 0:
+        val = vals[0]
+        within_tol = np.isclose(vals, val, atol=tol)
+        c = within_tol.sum()
+        if c >= count:
+            mode = val
+            count = c
+
+        vals = vals[np.invert(within_tol)]
+
+    return mode
+
+
 # Function for manually going through the dat_file.marker file containing the solver names as splitting
 # it directly with ':' as separator might not work as the solvers name could also contain it
 def read_markers(dat_file):
@@ -65,7 +82,7 @@ def main():
     if len(sys.argv) > 1:
         parser = argparse.ArgumentParser()
         parser.add_argument('-p', '--path', type=str)
-        parser.add_argument('-t', '--total_time', type=str)
+        parser.add_argument('-t', '--total_time', action="store_true")
         parser.add_argument('-f', '--file', type=str)
         parser.add_argument('-m', '--mesh_level', type=int)
         args = parser.parse_args()
@@ -73,14 +90,17 @@ def main():
         if args.path is not None:
             os.chdir(args.path)
 
+        """    
         if args.total_time is not None:
             if args.total_time.lower() == 'yes':
                 plot_total_time = True
-
+        """
+        
         if args.file is not None:
             dat_filename = args.file
 
         mesh_level = args.mesh_level
+        plot_total_time = args.total_time
         
     data = pd.read_table(dat_filename, delim_whitespace=True, header=None)
     solvers = read_markers(dat_filename)
@@ -100,8 +120,8 @@ def main():
 
     # Find the median of the norm values and remove the rows where the
     # norm varies significantly
-    median = np.median(data['norm'].values)  # Might need to be changed to mode if floating point error can be handled
-    data = data[np.isclose(data['norm'], median, atol=10 ** (-6))]
+    mode = float_mode(data['norm'].values)
+    data = data[np.isclose(data['norm'], mode, atol=10 ** (-6))]
 
     if len(data) != n_solvers:
         print(f"WARNING: Solvers: {', '.join(list(set(solvers).difference(set(data['Solver'].values.tolist()))))} had incorrect solution")

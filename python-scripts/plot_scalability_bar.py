@@ -2,10 +2,10 @@
 Basic Python script that finds and plots the "scaling coefficients" for all solvers in a given file 
 The file should contain data for multiple mesh levels
 
-Usage is: 
-    python3 plot_scalability_bar.py   // When using predefined values
-    python3 plot_scalability_bar.py -f "file"  // When using predefined path, but given file
-    python3 plot_scalability_bar.py -f "file" -p "path"  // When using given path and file
+This script has three optional passable cmd args
+   1. -f (--file) for using a different file than the one predefined
+   2. -p (--path) for using a different path than the one predefined
+   4. -i (--ignore) for ignoring solvers with highest mesh level lower than the one passed as argument 
 """
 
 import numpy as np
@@ -39,11 +39,28 @@ os.chdir('/'.join(cwd_arr))
 #################################################
 
 
+# Function for computing the mode of a list of floating point values with a given tolerance
+def float_mode(vals, tol=10 ** (-6)):
+    count = -1
+    mode = -1
+    while len(vals) > 0:
+        val = vals[0]
+        within_tol = np.isclose(vals, val, atol=tol)
+        c = within_tol.sum()
+        if c >= count:
+            mode = val
+            count = c
+
+        vals = vals[np.invert(within_tol)]
+
+    return mode
+        
+
 # Function for computing the scaling coefficient b from equation t = a * n ^ b for a given solver
 def comp_coef(times, n_dofs):
     try:
         popt, pcov = curve_fit(lambda n, a, b: a * n ** b, n_dofs, times)
-    except RuntimeError:
+    except (RuntimeError, TypeError):
         return None
     else:
         return popt[1]
@@ -67,8 +84,8 @@ def failed_solvers(data):
         temp = data[data['MeshLevel'] == mesh_level]
         # Find the median of the norm values and remove the rows where the
         # norm varies significantly
-        median = np.median(temp['norm'].values)  # Might need to be changed to mode if floating point error can be handled
-        temp = temp[~np.isclose(temp['norm'], median, atol=10 ** (-6))]
+        mode = float_mode(temp['norm'].values)
+        temp = temp[~np.isclose(temp['norm'], mode, atol=10 ** (-6))]
         ret += temp['Solver'].values.tolist()
 
     return ret
@@ -76,11 +93,13 @@ def failed_solvers(data):
 
 def main():
     global dat_filename  # Python isn't smart enough so this needs to be declared
+    ignore_mesh_level = None
     
     if len(sys.argv) > 1:
         parser = argparse.ArgumentParser()
         parser.add_argument('-p', '--path', type=str)
         parser.add_argument('-f', '--file', type=str)
+        parser.add_argument('-i', '--ignore', type=int)
         args = parser.parse_args()
 
         if args.path is not None:
@@ -88,6 +107,9 @@ def main():
 
         if args.file is not None:
             dat_filename = args.file
+
+        if args.ignore is not None:
+            ignore_mesh_level = float(args.ignore)
         
     data = pd.read_table(dat_filename, delim_whitespace=True, header=None)
     solvers = read_markers(dat_filename)
@@ -108,8 +130,14 @@ def main():
     coefs = []
 
     for solver in data['Solver'].values:
-        times = grouped[grouped['Solver'] == solver][use_time].values.tolist()
-        dofs = grouped[grouped['Solver'] == solver]['dofs'].values / 1_000_000  # Unit should be 1M dofs
+
+        temp = grouped[grouped['Solver'] == solver]
+        
+        times = temp[use_time].values.tolist()
+        dofs = temp['dofs'].values / 1_000_000  # Unit should be 1M dofs
+
+        if ignore_mesh_level is not None and max(temp['MeshLevel'].values) < ignore_mesh_level:
+            continue
 
         ret = comp_coef(times, dofs)
 
