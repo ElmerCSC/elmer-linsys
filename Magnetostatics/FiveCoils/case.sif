@@ -82,6 +82,8 @@ Solver 1
 
   Procedure = "CoilSolver" "CoilSolver"
 
+  Helmholtz Projection = Logical True
+
   Linear System Solver = "Iterative"
   Linear System Preconditioning = ILU1
   Linear System Max Iterations = 1000
