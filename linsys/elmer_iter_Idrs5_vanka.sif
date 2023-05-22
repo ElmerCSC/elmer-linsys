@@ -1,4 +1,4 @@
-  $LinMethod = 214560000
+  $LinMethod = 21456000
   $LinStr = "Idrs{5} + vanka"
 
   Linear System Solver = Iterative

@@ -1,4 +1,4 @@
-  $LinMethod = 215040000
+  $LinMethod = 21504000
   $LinStr = "Tfqmr + ILU0"
 
   Linear System Solver = Iterative

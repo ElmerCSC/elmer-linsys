@@ -1,4 +1,4 @@
-$LinMethod = 203000020
+$LinMethod = 20300020
 $LinStr = "FETI + MUMPS{10}"
 
   Linear System Symmetric =  True

@@ -4,7 +4,7 @@ Identifier consists of four main parts:
    1. developer  (one digit)
    2. solver/iterative method  (two digits)
    3. preconditioner  (one digit)
-   4. preconditioners solver (if such is needed)  (two digits)
+   4. preconditioners solver (if such is needed)  (one digits)
 
 Additionally, there are three additional values mixed in that dictate the parameter
 value passed to either the solver or preconditioner (one digit each). So let a be the
@@ -65,20 +65,20 @@ Preconditioning:
 ----------------------------------------------------------
 Preconditioner solver/iterative method:
 
-    no solver = 00  // includes instances with direct preconditioner, _none etc.
-    mumps = 01
-    mumps_10 = 02  // We can't have double precision parameters since otherwise we run out of digits
-    BiCGStab = 03
-    CG = 04
-    smoother = 05
-    wo_scaling = 06
-    BP = 07  // This goes against convention but would be hard to categorize otherwise
+    no solver = 0  // includes instances with direct preconditioner, _none etc.
+    mumps = 1
+    mumps_10 = 2  // We can't have double precision parameters since otherwise we run out of digits
+    BiCGStab = 3
+    CG = 4
+    smoother = 5
+    wo_scaling = 6
+    BP = 7  // This goes against convention but would be hard to categorize otherwise
 ----------------------------------------------------------
  
 
-Thus for example elmer_iter_BiCGStab2_BILU0 would become: 206250000  (2_06_2_5_0_00_0)
-direct_umfpack would be: 102000000  (1_02_0_0_0_00_0)
-and elmer_CGR_GMG_jacobi_BiCGStab_none would be: 204020030  (2_04_0_2_0_03_0)
+Thus for example elmer_iter_BiCGStab2_BILU0 would become: 20625000  (2_06_2_5_0_0_0)
+direct_umfpack would be: 10200000  (1_02_0_0_0_0_0)
+and elmer_CGR_GMG_jacobi_BiCGStab_none would be: 20402030  (2_04_0_2_0_3_0)
 etc.
     
 

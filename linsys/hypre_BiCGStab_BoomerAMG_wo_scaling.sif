@@ -1,4 +1,4 @@
-$LinMethod = 306070060  
+$LinMethod = 30607060  
 $LinStr = "Hypre: BiCGStab + boomeramg + without scaling"
 
 Linear System Use Hypre = Logical True

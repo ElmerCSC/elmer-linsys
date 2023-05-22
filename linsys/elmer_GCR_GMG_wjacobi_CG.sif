@@ -1,4 +1,4 @@
-$LinMethod=204030040
+$LinMethod=20403040
 $LinStr = "GCR+GMG{wJacobi}+CG"
 
   MG Post Smoothing Iterations = 15

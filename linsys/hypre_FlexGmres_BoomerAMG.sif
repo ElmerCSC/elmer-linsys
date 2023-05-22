@@ -1,4 +1,4 @@
-$LinMethod = 309070000
+$LinMethod = 30907000
 $LinStr = "Hypre: FlexGmres + BoomerAMG"
 
   Linear System Row Equilibration = Logical True
