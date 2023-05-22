@@ -27,7 +27,7 @@ $LinStr = "GCR + BP{CMG{10}}"
   Block 33: Linear System Solver = multigrid	
   !Linear System Preconditioning = ILU0
   Linear System Convergence Tolerance = 1.0e-05
-  Linear System Max Iterations = 50
+  Linear System Max Iterations = 500
   Multigrid Levels = Integer 10
 
 !--- basic algebraic multigrid iteration stuff

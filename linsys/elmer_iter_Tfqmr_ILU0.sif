@@ -4,7 +4,7 @@
   Linear System Solver = Iterative
   Linear System Iterative Method = Tfqmr
 
-  Linear System Max Iterations = 1000
+  Linear System Max Iterations = 10000
   Linear System Convergence Tolerance = 1.0e-8
   Linear System Preconditioning = ILU0
   Linear System ILUT Tolerance = 1.0e-3

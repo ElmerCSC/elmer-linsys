@@ -3,7 +3,7 @@
 
   Linear System Solver = Iterative
   Linear System Iterative Method = gcr
-  Linear System Max Iterations = 1000
+  Linear System Max Iterations = 10000
   Linear System Convergence Tolerance = 1.0e-8
   Linear System Abort Not Converged = True
   Linear System Residual Output = 1 

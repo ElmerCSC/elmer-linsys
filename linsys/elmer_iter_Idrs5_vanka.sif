@@ -5,7 +5,7 @@
   Linear System Iterative Method = Idrs
   Idrs Parameter = 5
 
-  Linear System Max Iterations = 1000
+  Linear System Max Iterations = 10000
   Linear System Convergence Tolerance = 1.0e-8
   Linear System Preconditioning = vanka
   Linear System ILUT Tolerance = 1.0e-3

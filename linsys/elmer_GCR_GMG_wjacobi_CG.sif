@@ -26,7 +26,7 @@ $LinStr = "GCR+GMG{wJacobi}+CG"
 
   Linear System Convergence Tolerance = 1.0e-8
   Linear System Abort Not Converged = True
-  Linear System Max Iterations = 50
+  Linear System Max Iterations = 500
   Linear System Iterative Method = GCR
   Linear System Residual Output = 1
   Linear System Preconditioning = Multigrid

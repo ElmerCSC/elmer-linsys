@@ -11,7 +11,7 @@ $LinStr = "Hypre: FlexGmres + BoomerAMG"
 
   Linear System Iterative Method = FlexGmres
   Hypre GMRES dimension = Integer 50
-  Linear System Max Iterations = 1000
+  Linear System Max Iterations = 10000
   Linear System Convergence Tolerance = 1.0e-3
   Linear System Preconditioning = boomeramg
   HYPRE Block Diagonal = Logical True
