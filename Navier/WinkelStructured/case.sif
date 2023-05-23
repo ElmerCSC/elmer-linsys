@@ -72,7 +72,7 @@ Solver 2
   Equation = SaveScalars
   Procedure = "SaveData" "SaveScalars"
   
-  Filename = f.dat
+  Filename = f$ipar(1)$.dat
   File Append = Logical True
   Parallel Reduce = Logical True
 

@@ -6,8 +6,11 @@ path=Poisson/WinkelStructured
 # Define the problem type
 problem=Poisson
 
+# Define the number of partitions (should be np)
+partitions=4
+
 # Define here the solver to be used
-solver=linsys/trilinos_ml_sgs.sif
+solver=linsys/direct_MUMPS.sif
 # linMarker=??????
 
 if ! grep -Fxq "$solver" solver-lists/$problem-Solvers.txt
@@ -22,12 +25,15 @@ fi
 # Remove the result files if they already exist
 # rm -f $path/results/f$linMarker.*
 
-# Copy the valid case and solver file into the case.sif file
+# Copy the valid case into the case.sif file
+# This can be commented out if there is only a single
+# default case file in the folder
 cp $path/case_single.sif $path/case.sif
+
 cp $solver $path/linsys.sif
 cd $path
 
-for mesh_level in 2 3 4; do
+for mesh_level in 2; do
 	
    echo 
    echo 
@@ -37,7 +43,7 @@ for mesh_level in 2 3 4; do
 	
    start=$(date +%s)
     
-   mpirun -np 4 ElmerSolver case.sif -ipar 1 $mesh_level
+   mpirun -np 4 ElmerSolver case.sif -ipar 2 $mesh_level $partitions
 
    end=$(date +%s)
 

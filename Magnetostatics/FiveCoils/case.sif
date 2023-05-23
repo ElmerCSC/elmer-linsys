@@ -8,6 +8,7 @@
 Header
   CHECK KEYWORDS Warn
   Mesh DB "." "fivecoils"
+  Results Directory "results"
 End
 
 Simulation
@@ -169,7 +170,7 @@ Solver 5
   Equation = SaveTimings
   Procedure = "SaveData" "SaveScalars"
 
-  Filename = f.dat
+  Filename = f$ipar(1)$.dat
   File Append = Logical True
   Parallel Reduce = Logical True
 

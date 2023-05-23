@@ -6,13 +6,18 @@ path=Poisson/WinkelStructured
 # Define the problem type
 problem=Poisson
 
+# Define the number of partitions (should be np)
+partitions=4
+
 # Remove the result files if they already exist
-rm -f $path/results/f.*
+# rm -f $path/results/f.*
 
 # Copy the valid case file into the case.sif file
+# This can be commented out if there is only a single
+# default case file in the folder
 cp $path/case_all.sif $path/case.sif
 
-for mesh_level in 2; do
+for mesh_level in 1; do
 
     for solver in linsys/*.sif; do
 
@@ -30,7 +35,7 @@ for mesh_level in 2; do
 
             start=$(date +%s)
     
-            mpirun -np 4 ElmerSolver case.sif -ipar 1 $mesh_level
+            mpirun -np 4 ElmerSolver case.sif -ipar 2 $mesh_level $partitions
 
             end=$(date +%s)
 

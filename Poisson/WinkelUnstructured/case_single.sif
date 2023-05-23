@@ -67,7 +67,7 @@ Solver 2
   Equation = SaveTimings
   Procedure = "SaveData" "SaveScalars"
 
-  Filename = f$LinMethod$.dat
+  Filename = f$LinMethod$_$ipar(1)$.dat
   Variable 1 = Temperature
   Operator 1 = dofs
   Operator 2 = elements

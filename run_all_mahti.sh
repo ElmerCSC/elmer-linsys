@@ -6,7 +6,7 @@
 #SBATCH --partition=medium
 #SBATCH --account=project_2001628
 #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=32
+#SBATCH --ntasks-per-node=64
 
 export OMP_NUM_THREADS=1
 module load elmer/latest
@@ -17,10 +17,15 @@ path=Poisson/WinkelStructured
 # Define the problem type
 problem=Poisson
 
+# Define the number of partitions (should be nodes * ntasks-per-node)
+partitions=128
+
 # Uncomment this if you don't want to append to existing results
 # rm -f $path/results/f.*
 
 # Copy the valid case file into the case.sif file
+# This can be commented out if there is only a single
+# default case file in the folder
 cp $path/case_all.sif $path/case.sif
 
 for mesh_level in 3 4 5; do
@@ -41,7 +46,7 @@ for mesh_level in 3 4 5; do
             echo "Starting $solver with mesh level $mesh_level"
             echo
     
-            srun ElmerSolver case.sif -ipar 1 $mesh_level
+            srun ElmerSolver case.sif -ipar 2 $mesh_level $partitions
 
             end=$(date +%s)
 
