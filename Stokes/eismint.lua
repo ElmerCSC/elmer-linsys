@@ -3,11 +3,15 @@ hmin=10.0
 spy=31556926
 pa_to_mpa=1.0E-6
 
-g=9.81*spy^(2.0)
-rho=910*spy^(-2.0)*pa_to_mpa
+-- g=9.81*spy^(2.0)
+-- rho=910*spy^(-2.0)*pa_to_mpa
+g=9.81
+rho=910.0
 n=3.0
-Ao=1.0E-16*(pa_to_mpa^(3))
-a=0.3
+-- Ao=1.0E-16*(pa_to_mpa^(3))
+-- a=0.3
+Ao=1.0E-16/spy
+a=0.3/spy
 L=750.0e03
 
 -- rate factors and molar activiation energies

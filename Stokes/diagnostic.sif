@@ -108,7 +108,7 @@ End
 
 ! vectorized & threaded version of the Navier-Stokes solver.
 Solver 2
-!  Exec Solver = "Never"
+  Exec Solver = "Never"
   Equation = "Stokes-Vec"
   Procedure = "IncompressibleNSVec" "IncompressibleNSSolver"
   Div-Curl Discretization = Logical False
@@ -120,7 +120,7 @@ Solver 2
   Linear System Abort Not Converged = Logical False
 
 
-  include BPC.sif
+  include "BPC.sif"
 
 
   !Non-linear iteration settings:
@@ -205,7 +205,7 @@ End
 Body Force 1
   Flow BodyForce 1 = 0.0
   Flow BodyForce 2 = 0.0 
-  Flow BodyForce 3 = #-g
+  Flow BodyForce 3 = #-g*spy^(2.0)
 End
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -213,7 +213,7 @@ End
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 Material 1
   Name = "Ice"
-  Density = Real #rho
+  Density = Real #rho*spy^(-2.0)*pa_to_mpa
 
   ! First viscosity with newtonian fluid
   ! happens to give velocities of proper size
@@ -231,7 +231,7 @@ Material 1
   Activation Energy 2 = Real #Q2 
   Glen Enhancement Factor = Real 1.0
   !Relative Temperature = Real #Tc
-  Arrhenius Factor = Real #Ao
+  Arrhenius Factor = Real #Ao*spy*(pa_to_mpa^3.0)
 End
 
 
