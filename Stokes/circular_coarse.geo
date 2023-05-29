@@ -1,6 +1,6 @@
-resbound = 4.0;
-rescent = 50.0;
-reshalo = 5.0;
+resbound = 10.0;
+rescent = 100.0;
+reshalo = 10.0;
 r0 = 750.0;
 halo = 50.0;
 layersperquarter=20;

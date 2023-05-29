@@ -20,7 +20,7 @@
 ! echo on
 
 
-$name="init"
+$name="diagnostic"
 $meshdb="circular_coarse"
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -106,7 +106,57 @@ Solver 1
   !Correct Surface = Logical True
 End
 
+! vectorized & threaded version of the Navier-Stokes solver.
 Solver 2
+!  Exec Solver = "Never"
+  Equation = "Stokes-Vec"
+  Procedure = "IncompressibleNSVec" "IncompressibleNSSolver"
+  Div-Curl Discretization = Logical False
+
+  Optimize Bandwidth = Logical True
+  Flow Model = Stokes
+!  Stabilization Method = String Stabilized
+
+  Linear System Abort Not Converged = Logical False
+
+
+  include BPC.sif
+
+
+  !Non-linear iteration settings:
+  !------------------------------ 
+  Nonlinear System Max Iterations = 50
+  Nonlinear System Convergence Tolerance  = 1.0e-5
+  Nonlinear System Newton After Iterations = 3
+  Nonlinear System Newton After Tolerance = 1.0e-1
+  !Viscosity Newton Relaxation Factor = Real $2.0/3.0
+  Nonlinear System Consistent Norm = True
+!  Nonlinear System Relaxation Factor = Variable "nonlin iter"
+!    Real
+!      1    1.0
+!      5.0  0.5
+!      10.0 0.5
+!    End 
+  
+
+  ! Convergence on timelevel (not required here)
+  !---------------------------------------------
+  Steady State Convergence Tolerance = Real 1.0e-3
+
+  !Relative Integration Order = -1
+  Number of Integration Points = Integer 21 ! 21, 28, 44, 64, ...
+
+  ! 1st iteration viscosity is constant
+  Constant-Viscosity Start = Logical True
+
+! Some timing info
+!  Boundary Assembly Timing = Logical True
+!  Bulk Assembly Timing = Logical True
+!  Solver Timing = Logical True
+!  Linear System Timing = Logical True
+End
+
+Solver 3
   Equation = "ResultOutput"
   Procedure = "ResultOutputSolve" "ResultOutputSolver"
   Output File Name = "$name$"
@@ -133,7 +183,7 @@ End
 ! EQUATION
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 Equation 1
- Active Solvers(2) = 1 2 
+ Active Solvers(3) = 1 2 3
  Convection = Computed ! we have a computed velocity field
  Flow Solution Name = String "Flow Solution" ! and that is its name
  !NS Convect = False 
@@ -152,17 +202,38 @@ End
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! BODY FORCE
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+Body Force 1
+  Flow BodyForce 1 = 0.0
+  Flow BodyForce 2 = 0.0 
+  Flow BodyForce 3 = #-g
+End
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! MATERIAL
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 Material 1
+  Name = "Ice"
+  Density = Real #rho
 
-  ! Dummy, for the time being
-  !----------------
-  Density = Real 917.0
+  ! First viscosity with newtonian fluid
+  ! happens to give velocities of proper size
+  Viscosity = Real 0.1
+
+  ! Nonnewtonian viscosity
+  Viscosity Model = String Glen
+  Glen Exponent = Real #n
+  Critical Shear Rate =  Real 1.0E-10
+  ! Paterson value in MPa^-3a^-1
+  Limit Temperature = Real -10.0
+  Rate Factor 1 = Real #A1 
+  Rate Factor 2 = Real #A2 
+  Activation Energy 1 = Real #Q1    
+  Activation Energy 2 = Real #Q2 
+  Glen Enhancement Factor = Real 1.0
+  !Relative Temperature = Real #Tc
+  Arrhenius Factor = Real #Ao
 End
+
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !BOUNDARY CONDITIONS
@@ -175,6 +246,9 @@ End
 Boundary Condition 2
   Name = "bedrock"
   Bottom Surface = Real 0.0
+  Velocity 1 = 0.0
+  Velocity 2 = 0.0
+  Velocity 3 = 0.0
 End
 
 Boundary Condition 3
