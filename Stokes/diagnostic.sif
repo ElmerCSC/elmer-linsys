@@ -21,7 +21,7 @@
 
 
 $name="diagnostic"
-$meshdb="circular_coarse"
+$meshdb="circular"
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! HEADER
