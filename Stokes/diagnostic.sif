@@ -1,0 +1,262 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! Elmer Solver input file
+!!
+!! Initialization for EISMINT
+!!
+!! All units are in m-MPa-year
+!! Temperatures are in Kelvin
+!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!---LUA BEGIN
+! assert(loadfile('./eismint.lua'))()
+!---LUA END
+
+
+
+! switch that on for debugging only
+! ---------------------------------
+! check keywords warn
+! echo on
+
+
+$name="diagnostic"
+$meshdb="circular_coarse"
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! HEADER
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Partitioned mesh
+Header
+  Mesh DB "." $meshdb
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! CONSTANTS
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Constants
+ Gas Constant = Real 8.314D00 ! in m-k-s
+  Stefan Boltzmann = Real 6.78E-08
+  Gravity(4) = 0 0 -1 9.81
+End
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! SIMULATION
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Simulation
+  Coordinate System  = "Cartesian 3D"
+  Simulation Type = "Steady State"             
+
+  ! Iterations between different solvers
+  ! ------------------------------------
+  Steady State Max Iterations = 1 
+  Steady State Min Iterations = 1
+
+  ! usually, Dirichlet BC's are initialized 
+  ! before everything else. Sometimes those 
+  ! conditions are dependent on solutions of
+  ! earlier solvers; next line ensures that
+  ! this is not an issue
+  !-----------------------------------------
+  Initialize Dirichlet Conditions = Logical False
+  
+  !Restart Before Initial Conditions = Logical False
+  ! Output files
+  ! ------------
+  !   Binary Output = Logical True
+
+   Output File = "$name$.result"
+
+  ! how verbose the solver should be
+  !  1 = very low (Finnish style = crucial feedback, only) 
+  ! 42 = the answer to all and everything
+  !-------------------------------------------------------
+  max output level = 3
+  Extruded Mesh Levels = #mlev
+  Extruded Max Coordinate = Real 1
+
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! SOLVER
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Solver 1
+  Exec Solver = "before timestep"
+
+  Equation = "MapCoordinate"
+  Procedure = "StructuredMeshMapper" "StructuredMeshMapper"
+
+  Variable = -nooutput dummyvar
+
+  Active Coordinate = Integer 3 ! the mesh-update is y-direction
+
+! For time being this is currently externally allocated
+  Mesh Velocity Variable = String "Mesh Velocity"
+
+! The 1st value is special as the mesh velocity could be unrelistically high
+  Mesh Velocity First Zero = Logical True
+
+!  Top Surface Variable = String "Zs"
+
+  Dot Product Tolerance = Real 0.001
+  
+  !Minimum Mesh Height = Real #hmin
+  !Minimum Height = Real #hmin
+  !Correct Surface = Logical True
+End
+
+! vectorized & threaded version of the Navier-Stokes solver.
+Solver 2
+  !Exec Solver = "Never"
+  Equation = "Stokes-Vec"
+  Procedure = "IncompressibleNSVec" "IncompressibleNSSolver"
+  Div-Curl Discretization = Logical False
+
+  Optimize Bandwidth = Logical True
+  Flow Model = Stokes
+!  Stabilization Method = String Stabilized
+
+  Linear System Abort Not Converged = Logical False
+
+
+  include "BPC.sif"
+
+
+  !Non-linear iteration settings:
+  !------------------------------ 
+  Nonlinear System Max Iterations = 50
+  Nonlinear System Convergence Tolerance  = 1.0e-6
+  Nonlinear System Newton After Iterations = 5
+  Nonlinear System Newton After Tolerance = 1.0e-3
+  Viscosity Newton Relaxation Factor = Real $2.0/3.0
+  Nonlinear System Consistent Norm = True
+!  Nonlinear System Relaxation Factor = Variable "nonlin iter"
+!    Real
+!      1    1.0
+!      5.0  0.5
+!      10.0 0.5
+!    End 
+  
+
+  ! Convergence on timelevel (not required here)
+  !---------------------------------------------
+  Steady State Convergence Tolerance = Real 1.0e-3
+
+  !Relative Integration Order = -1
+  Number of Integration Points = Integer 21 ! 21, 28, 44, 64, ...
+
+  ! 1st iteration viscosity is constant
+  Constant-Viscosity Start = Logical True
+
+! Some timing info
+!  Boundary Assembly Timing = Logical True
+!  Bulk Assembly Timing = Logical True
+!  Solver Timing = Logical True
+!  Linear System Timing = Logical True
+End
+
+Solver 3
+  Equation = "ResultOutput"
+  Procedure = "ResultOutputSolve" "ResultOutputSolver"
+  Output File Name = "$name$"
+  Vtu format = Logical True
+  !Scalar Field 1 = "pressure"
+  Discontinuous Galerkin = Logical True
+  Discontinuous Bodies = Logical True
+  !Vector Field 1 = "Velocity"
+  Save Geometry Ids = Logical True
+End 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! BODIES (i.e., domains to compute on)
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Body 1
+  Name = "glacier"
+  Equation = 1
+  Material = 1
+  Body Force = 1
+  Initial Condition = 1
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! EQUATION
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Equation 1
+ Active Solvers(3) = 1 2 3
+ Convection = Computed ! we have a computed velocity field
+ Flow Solution Name = String "Flow Solution" ! and that is its name
+ !NS Convect = False 
+End
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! INITIAL CONDITIONS
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Initial Condition 1
+  Depth = Real 0.0
+  Height = Real 0.0
+End
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! BODY FORCE
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Body Force 1
+  Flow BodyForce 1 = 0.0
+  Flow BodyForce 2 = 0.0 
+  Flow BodyForce 3 = #-g*spy^(2.0)
+End
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! MATERIAL
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Material 1
+  Name = "Ice"
+  Density = Real #rho*spy^(-2.0)*pa_to_mpa
+
+  ! First viscosity with newtonian fluid
+  ! happens to give velocities of proper size
+  Viscosity = Real 0.5
+
+  ! Nonnewtonian viscosity
+  Viscosity Model = String Glen
+  Glen Exponent = Real #n
+  Critical Shear Rate =  Real 1.0E-10
+  ! Paterson value in MPa^-3a^-1
+  Limit Temperature = Real -10.0
+  Rate Factor 1 = Real #A1 
+  Rate Factor 2 = Real #A2 
+  Activation Energy 1 = Real #Q1    
+  Activation Energy 2 = Real #Q2 
+  Glen Enhancement Factor = Real 1.0
+  !Relative Temperature = Real #Tc
+  Set Arrhenius Factor = Logical True
+  Arrhenius Factor = Real #Ao*spy*(pa_to_mpa^(-3.0))
+  !Arrhenius Factor = Real 1.0e-50
+End
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!BOUNDARY CONDITIONS
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Boundary Condition 1
+  Name = "side"
+  Target Boundaries(1) = 1 
+End
+
+Boundary Condition 2
+  Name = "bedrock"
+  Bottom Surface = Real 0.0
+  Velocity 1 = 0.0
+  Velocity 2 = 0.0
+  Velocity 3 = 0.0
+End
+
+Boundary Condition 3
+  Top Surface = Variable Coordinate 1, Coordinate 2
+     Real Lua "bueler(tx[0],tx[1])"
+!     Real Lua "elev(tx[0],tx[1])"
+End
+
+
