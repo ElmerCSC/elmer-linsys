@@ -21,14 +21,14 @@
 
 
 $name="diagnostic"
-$meshdb="circular_coarse"
+$meshdb="circular_"
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! HEADER
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Partitioned mesh
 Header
-  Mesh DB "." $meshdb
+  Mesh DB "." $meshdb$$ipar(0)$
   Include Path ""
   Results Directory "results"
 End
@@ -70,12 +70,15 @@ Simulation
 
    Output File = "$name$.result"
 
+   Simulation Timing = Logical True
+
   ! how verbose the solver should be
   !  1 = very low (Finnish style = crucial feedback, only) 
   ! 42 = the answer to all and everything
   !-------------------------------------------------------
   max output level = 3
-  Extruded Mesh Levels = $ipar(0)
+
+  Extruded Mesh Levels = #mlev
   Extruded Max Coordinate = Real 1
 
 End
@@ -120,6 +123,9 @@ Solver 2
 !  Stabilization Method = String Stabilized
 
   Linear System Abort Not Converged = Logical False
+
+  Linear System Timing = True
+  Solver Timing = True
 
 
   include "linsys.sif"
@@ -174,8 +180,9 @@ End
 
 Solver 4
 !  Exec Solver = after simulation
+!  Exec Solver = Never
 
-  Equation = SaveScalars
+  Equation = SaveTimings
   Procedure = "SaveData" "SaveScalars"
 
   Filename = f$ipar(1)$.dat
