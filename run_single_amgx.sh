@@ -22,8 +22,8 @@ problem=PoissonAMGX
 partitions=4
 
 # Declare here which solver is to be used
-solver=elmer_amgx_fgrmes.sif
-config=elmer_amgx_fgrmes.json
+solver=linsysAMGX/elmer_amgx_fgrmes.sif
+config=linsysAMGX/elmer_amgx_fgrmes.json
 # linMarker=??????
 
 if ! grep -Fxq "$solver" solver-lists/$problem-Solvers.txt
@@ -42,8 +42,8 @@ fi
 # default case file in the folder
 cp $path/case_amgx.sif $path/case.sif
 
-cp linsysAMGX/$solver $path/linsys_amgx.sif
-cp linsysAMGX/$config $path/config.json
+cp $solver $path/linsys_amgx.sif
+cp $config $path/config.json
 
 cd $path
 
