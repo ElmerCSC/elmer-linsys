@@ -1,10 +1,10 @@
-#!/bin/bash -f
+#!/bin/bash
 #SBATCH --time=00:20:00
-#SBATCH --job-name=amgx_single
+#SBATCH --job-name=amgx_all
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
-#SBATCH --partition=gpusmall
-#SBATCH --gres=gpu:a100:1,nvme:950
+#SBATCH --partition=gpumedium
+#SBATCH --gres=gpu:a100:4,nvme:950
 #SBATCH --account=project_2001628
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=4
@@ -28,8 +28,6 @@ partitions=4
 # This can be commented out if there is only a single
 # default case file in the folder
 cp $path/case_amgx.sif $path/case.sif
-
-cd $path
 
 for mesh_level in 3 4 5; do
 
