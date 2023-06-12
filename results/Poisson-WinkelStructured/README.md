@@ -1,3 +1,5 @@
-#Poisson problem with Winkel Structured geometry
+# Poisson problem with Winkel Structured geometry
 
-![alt text](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Poisson-WinkelStructured/sparsity_structure.png?raw=true
+Visualization of the sparsity structure
+
+![Sparsity structure](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Poisson-WinkelStructured/sparsity_structure.png?raw=true)
