@@ -1,3 +1,4 @@
+#!/bin/bash
 ################################
 ## SLURM batchjob script for
 ## Elmer on LUMI
@@ -6,16 +7,15 @@
 ##    CSC-IT Center for Sciencce
 ##
 ################################
-
-#!/bin/bash 
-#SBATCH --time=00:30:00
+ 
+#SBATCH --time=00:10:00
 #SBATCH --job-name=ChEESE_test
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
 #SBATCH --partition=standard
 
 ####### change to your project #######
-#SBATCH --account=project_200XXXXX
+#SBATCH --account=project_462000233
 
 ####### change to numbers of nodes and MPI tasks ###
 ####### NB: we provide meshes for 128,256,512 and 1024 partitions #####
