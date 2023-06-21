@@ -9,7 +9,7 @@ If we want a bigger original mesh have a smaller value for clscale
 gmsh winkel.geo -3 -clscale 0.2
 ```
 
-! Transfer mesh into Elmer format
+Transfer mesh into Elmer format (`#np` is number of MPI tasks
 ```
 ElmerGrid 14 2 winkel.msh -autoclean -partdual -metiskway #np -nooverwrite
 ```
