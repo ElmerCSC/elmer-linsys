@@ -64,8 +64,8 @@ Solver 1
 
 !!!!!!!!!  Include the wanted solver here  !!!!!!!!!
 
-  include hypre_BiCGStab_BoomerAMG_wos.sif
-!  include linsys.sif
+  include elmer_IDRS5_ILU0.sif
+!  include elmer_CG_ILU0.sif
   
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
