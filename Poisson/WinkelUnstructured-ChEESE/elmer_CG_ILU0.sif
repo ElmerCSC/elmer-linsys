@@ -1,0 +1,12 @@
+$LinMethod = 2
+$LinStr = "CG + ILU0"
+
+Linear System Solver = Iterative
+Linear System Iterative Method = CG
+Linear System Max Iterations = 10000
+Linear System Convergence Tolerance = 1.0e-8
+Linear System Preconditioning = ILU0
+Linear System ILUT Tolerance = 1.0e-3
+Linear System Abort Not Converged = True
+Linear System Residual Output = 20
+Linear System Precondition Recompute = 1
