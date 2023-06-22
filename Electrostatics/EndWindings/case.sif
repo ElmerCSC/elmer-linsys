@@ -6,7 +6,7 @@ Header
 End
 
 Simulation
-  Mesh Levels = 1
+
   Max Output Level = 3
   Coordinate System = Cartesian
   Coordinate Mapping(3) = 1 2 3
@@ -89,7 +89,7 @@ Solver 2
 End
 
 Solver 3
-!  Exec Solver = Never
+  Exec Solver = Never
   Equation = VtuOutput
   Procedure = "ResultOutputSolve" "ResultOutputSolver"
   Output File Name = coupled
@@ -125,23 +125,34 @@ End
 
 Solver 5
 !  Exec Solver = Never
-  Equation = "SaveScalars"
+  Equation = "SaveTimings"
   Procedure = "SaveData" "SaveScalars"
   Filename = f$ipar(1)$.dat
 
   Variable 1 = Magnetic Flux Density e 1
-  Operator 1 = int mean
   Variable 2 = Magnetic Flux Density e 2
-  Operator 2 = int mean
   Variable 3 = Magnetic Flux Density e 3
-  Operator 3 = int mean
   
   Variable 4 = Magnetic Field Strength e 1
-  Operator 4 = int mean
   Variable 5 = Magnetic Field Strength e 2
-  Operator 5 = int mean
   Variable 6 = Magnetic Field Strength e 3
-  Operator 6 = int mean
+
+  Operator 1 = dofs
+  Operator 2 = elements
+  Operator 3 = partitions
+  Operator 4 = norm
+  Operator 5 = cpu time
+
+  Expression 1 = Real $ipar(0)
+
+! Give a unique tag to each line/method
+  Line Marker = Integer $LinMethod$
+
+! We write a separate file showing how marker is mapped to string of the method
+  Comment = String $LinStr$
+
+  File Append = True
+  Parallel Reduce = True
 End
 
 Equation 1
