@@ -129,13 +129,7 @@ Solver 5
   Procedure = "SaveData" "SaveScalars"
   Filename = f$ipar(1)$.dat
 
-  Variable 1 = Magnetic Flux Density e 1
-  Variable 2 = Magnetic Flux Density e 2
-  Variable 3 = Magnetic Flux Density e 3
-  
-  Variable 4 = Magnetic Field Strength e 1
-  Variable 5 = Magnetic Field Strength e 2
-  Variable 6 = Magnetic Field Strength e 3
+  Variable 1 = AV
 
   Operator 1 = dofs
   Operator 2 = elements
