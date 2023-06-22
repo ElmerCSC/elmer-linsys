@@ -24,45 +24,51 @@ def gen_test_mesh(save_points=False):
 
     gmsh.model.add("figure_8")
 
-    d_x = 75  # mm
-    d_y = 150  # mm
-    d_z = 10  # mm
+    d_x = 50  # mm
+    d_y = 100  # mm
+    d_z = 4 # mm
     r_wire = 2  # mm
+
+    r_head = 150  # mm
     
-    assert d_z > 4 * r_wire
+    assert d_z > r_wire
     
-    n_points = 100
-    mesh_size = 0.066
+    n_points = 50
+
+    assert n_points % 2 == 0
+    
+    mesh_size = 0.075  # 066
 
     gmsh.option.setNumber("Mesh.MeshSizeFactor", mesh_size);
 
-    x = d_x * np.sin(2 * np.linspace(0, 2 * np.pi, n_points))
-    y = d_y * np.cos(np.linspace(0, 2 * np.pi, n_points))
-    z = d_z * np.linspace(0, 1, n_points)
+    x = d_x * np.sin(2 * np.linspace(0, 2 * np.pi, n_points)[:-1])
+    y = d_y * np.cos(np.linspace(0, 2 * np.pi, n_points)[:-1])
+    z = d_z * np.sin(np.linspace(0, 2 * np.pi, n_points)[:-1])
 
     if save_points:
         arr = np.concatenate((x.reshape(-1, 1), y.reshape(-1, 1), z.reshape(-1, 1)), axis=1)
         np.savetxt("figure_8.csv", arr, delimiter=',')
 
-    points = []
-    for i in range(n_points):
+    points = [geo.addPoint(x[0], y[0], z[0])]
+    lines = []
+    for i in range(1, n_points - 1):
         points.append(geo.addPoint(x[i], y[i], z[i]))
 
     spline = geo.addSpline(points, tag=n_points + 1)
     spline_tag = n_points + 1
     
-    wire = geo.addWire([spline], tag=n_points + 2)
+    wire = geo.addWire([spline], tag=n_points + 2, checkClosed=False)
     wire_tag = n_points + 2
 
-    disk = geo.addDisk(x[0], y[0], z[0], r_wire, r_wire, zAxis=[x[1] - x[0], y[1] - y[0], z[1] - z[0]], tag=n_points + 3)
+    disk = geo.addDisk(x[0], y[0], z[0], r_wire, r_wire, zAxis=[x[1] - x[0], y[1] - y[0], z[1] - z[0]], tag=n_points + 3
     disk_tag = n_points + 3
     
-    pipe = geo.addPipe([(2, disk_tag)], wire_tag)
+    pipe = geo.addPipe([(2, disk_tag)], wire)
 
-    head = geo.addSphere(0, 0, -d_y - d_z / 2, d_y, tag=n_points + 4)
+    head = geo.addSphere(0, 0, -r_head - 4 * d_z, r_head, tag=n_points + 4)
     head_tag = n_points + 4
 
-    air = geo.addSphere(0, 0, -d_y + d_z / 2, 2 * d_y, tag=n_points + 5)
+    air = geo.addSphere(0, 0, -r_head + 4 * d_z, 2 * r_head, tag=n_points + 5)
     air_tag = n_points + 5
 
     air_without_objects = geo.cut([(3, air_tag)], [(3, head_tag)] + pipe, tag=n_points + 6, removeTool=False)
