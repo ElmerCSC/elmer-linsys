@@ -129,7 +129,7 @@ for mesh_level in "${MESH_LEVELS[@]}"; do
     echo "Plotting timings with mesh level $mesh_level"
     echo
     
-    save_as=$TIME_PATH/$TIME_NAME_$mesh_level.$FORMAT
+    save_as=$TIME_PATH/$TIME_NAME-$mesh_level.$FORMAT
 
     if $VIZ_TOT_TIME; then
 	python3 plot_times.py -p $RET_PATH -f $RET_FILE -s $save_as -t $TOL -v
