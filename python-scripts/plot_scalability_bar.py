@@ -5,7 +5,9 @@ The file should contain data for multiple mesh levels
 This script has three optional passable cmd args
    1. -f (--file) for using a different file than the one predefined
    2. -p (--path) for using a different path than the one predefined
-   4. -i (--ignore) for ignoring solvers with highest mesh level lower than the one passed as argument 
+   3. -i (--ignore) for ignoring solvers with highest mesh level lower than the one passed as argument
+   4. -s (--save_as) for defining the filename as which the figure will be saved. If not passed the figure will be visualized
+   5. -t (--tolerance) for defining the tolerance used in float mode and numpy.isclose
 """
 
 import numpy as np
@@ -15,45 +17,29 @@ import os
 import sys
 import argparse
 from scipy.optimize import curve_fit
-
-
-columns = ["Line Marker", "dofs", "elements", "partitions", "norm", "total CPU time (s)",
-           "simulation CPU time (s)", "simulation real time (s)", "linsys CPU time (s)",
-           "linsys real time (s)", "solver CPU time (s)", "solver real time (s)",
-           "MeshLevel"]
-
-use_time = "linsys CPU time (s)"  # Must be listed in columns
-
+from tools.tools import *
+from tools.parser import *
 
 ################# PREDEFINED ####################
+
+# Substrings defining the column names with wanted values
+time_col = "linsys cpu"  # The measured time of interest
+norm_col = "norm"  # The norm of interest
+partition_col = "partitions"  # The number of partitions used
+dof_col = "dofs"  # The number of degrees of freedom
+mesh_level_col = "expression"  # The used mesh level
 
 # Predefined .dat files that the code will look for if nothing is passed as argument
 dat_filename = "f.dat"
 
 # Change directory to predefined location from where the results can be read
 # (in this case WinkelStructed/results)
+org_cwd = os.getcwd()
 cwd_arr = os.getcwd().split('/')
 cwd_arr[-1] = "Poisson/WinkelStructured/results"
 os.chdir('/'.join(cwd_arr))
 
 #################################################
-
-
-# Function for computing the mode of a list of floating point values with a given tolerance
-def float_mode(vals, tol=10 ** (-6)):
-    count = -1
-    mode = -1
-    while len(vals) > 0:
-        val = vals[0]
-        within_tol = np.isclose(vals, val, atol=tol)
-        c = within_tol.sum()
-        if c >= count:
-            mode = val
-            count = c
-
-        vals = vals[np.invert(within_tol)]
-
-    return mode
         
 
 # Function for computing the scaling coefficient b from equation t = a * n ^ b for a given solver
@@ -64,61 +50,61 @@ def comp_coef(times, n_dofs):
         return None
     else:
         return popt[1]
-    
-
-# Function for manually going through the dat_file.marker file containing the solver names as splitting
-# it directly with ':' as separator might not work as the solvers name could also contain it
-def read_markers(dat_file):
-    filename = f"{dat_file}.marker"
-    solvers = []
-    with open(filename) as file:
-        for line in file:
-            solvers.append(line.strip().split(': ', 1)[1])
-
-    return solvers
 
 
-def failed_solvers(data):
+def failed_solvers(data, tol):
     ret = []
-    for mesh_level in data['MeshLevel'].unique():
-        temp = data[data['MeshLevel'] == mesh_level]
-        # Find the median of the norm values and remove the rows where the
+    for ml in data[mesh_level_col].unique():
+        temp = data[data[mesh_level_col] == ml]
+        # Find the mode of the norm values and remove the rows where the
         # norm varies significantly
-        mode = float_mode(temp['norm'].values)
-        temp = temp[~np.isclose(temp['norm'], mode, atol=10 ** (-6))]
+        mode = float_mode(temp[norm_col].values, tol=tol)
+        temp = temp[~np.isclose(temp[norm_col], mode, atol=tol)]
         ret += temp['Solver'].values.tolist()
 
     return ret
 
 
 def main():
-    global dat_filename  # Python isn't smart enough so this needs to be declared
+    global dat_filename, time_col, norm_col, partition_col, dof_col, mesh_level_col
     ignore_mesh_level = None
+    save_as = None
+    tolerance = 10 ** (-6)
     
     if len(sys.argv) > 1:
-        parser = argparse.ArgumentParser()
-        parser.add_argument('-p', '--path', type=str)
-        parser.add_argument('-f', '--file', type=str)
-        parser.add_argument('-i', '--ignore', type=int)
-        args = parser.parse_args()
+        args = parse_cmd()
 
-        if args.path is not None:
-            os.chdir(args.path)
+        if args['path'] is not None:
+            os.chdir(args['path'])
 
-        if args.file is not None:
-            dat_filename = args.file
+        if args['file'] is not None:
+            dat_filename = args['file']
 
-        if args.ignore is not None:
-            ignore_mesh_level = float(args.ignore)
+        if args['ignore'] is not None:
+            ignore_mesh_level = float(args['ignore'])
+
+        if args['tolerance'] is not None:
+            tolerance = args['tolerance']
+
+        if args['save_as'] is not None:
+            save_as = args['save_as']
         
     data = pd.read_table(dat_filename, delim_whitespace=True, header=None)
     solvers = read_markers(dat_filename)
 
-    data.columns = columns
+    column_names = read_names(dat_filename)
+
+    time_col = [s for s in column_names if time_col in s][0]
+    norm_col = [s for s in column_names if norm_col in s][0]
+    partition_col = [s for s in column_names if partition_col in s][0]
+    dof_col = [s for s in column_names if dof_col in s][0]
+    mesh_level_col = [s for s in column_names if mesh_level_col in s][0]
+    
+    data.columns = column_names
     data['Solver'] = solvers
 
     # Drop the row if the solver failed
-    remove_solvers = list(set(failed_solvers(data)))
+    remove_solvers = list(set(failed_solvers(data, tolerance)))
 
     if len(remove_solvers) != 0:
         data = data[~data['Solver'].isin(remove_solvers)]
@@ -133,10 +119,10 @@ def main():
 
         temp = grouped[grouped['Solver'] == solver]
         
-        times = temp[use_time].values.tolist()
-        dofs = temp['dofs'].values / 1_000_000  # Unit should be 1M dofs
+        times = temp[time_col].values.tolist()
+        dofs = temp[dof_col].values / 1_000_000  # Unit should be 1M dofs
 
-        if ignore_mesh_level is not None and max(temp['MeshLevel'].values) < ignore_mesh_level:
+        if ignore_mesh_level is not None and max(temp[mesh_level_col].values) < ignore_mesh_level:
             continue
 
         ret = comp_coef(times, dofs)
@@ -152,14 +138,25 @@ def main():
     zipped.sort(key=lambda tup: tup[1])
 
     # Plot the coefs as a barplot
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(14, 8))
     bars = ax.barh([solver for solver, coef in zipped], [coef for solver, coef in zipped])
     ax.bar_label(bars)
     ax.set_ylabel("Solver")
     ax.set_xlabel(f"$b$ solved from: $t = a \cdot  n ^ b$")
-    ax.set_title(f"Scaling coefs for {'-'.join(os.getcwd().split('/')[-3:-1])} ({data['partitions'][0]} partitions)")
+    ax.set_title(f"Scaling coefs for {'-'.join(os.getcwd().split('/')[-3:-1])} ({data[partition_col][0]} partitions)")
 
-    plt.show()
+    plt.tight_layout()
+
+    if save_as is not None:
+        if len(save_as.split('/')) == 1:
+            plt.savefig(str(org_cwd) + '/' + save_as)
+        else:
+            plt.savefig(save_as)
+    else:
+        plt.show()
+
+    os.chdir(org_dir)
 
 
-main()
+if __name__ == "__main__":
+    main()
