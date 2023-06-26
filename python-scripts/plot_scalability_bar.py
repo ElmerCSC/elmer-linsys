@@ -155,7 +155,7 @@ def main():
     else:
         plt.show()
 
-    os.chdir(org_dir)
+    os.chdir(org_cwd)
 
 
 if __name__ == "__main__":
