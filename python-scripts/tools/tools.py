@@ -8,7 +8,9 @@ import numpy as np
 def float_mode(vals, tol=10 ** (-6)):
     count = -1
     mode = -1
-    while len(vals) > 0:
+    max_iter = len(vals)
+    i = 0
+    while len(vals) > 0 and i < max_iter:
         val = vals[0]
         within_tol = np.isclose(vals, val, atol=tol)
         c = within_tol.sum()
@@ -17,6 +19,8 @@ def float_mode(vals, tol=10 ** (-6)):
             count = c
 
         vals = vals[np.invert(within_tol)]
+
+        i++
 
     return mode
 
