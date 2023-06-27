@@ -6,10 +6,11 @@
 #SBATCH --partition=medium
 #SBATCH --account=project_2001628
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=128
+#SBATCH --ntasks-per-node=64
 
 export OMP_NUM_THREADS=1
 module load elmer/latest
+module load python-data
 
 
 
@@ -32,7 +33,7 @@ SCRIPT_PATH=python-scripts
 PROBLEM=Poisson
 
 # Define the mesh levels to loop over
-MESH_LEVELS=(2 3 4)
+MESH_LEVELS=(1 2)
 
 # Define the format in which figures should be saved
 FORMAT=png
@@ -72,7 +73,7 @@ VIZ_TOT_TIME=false
 # Copy the valid case file into the case.sif file
 # This can be commented out if there is only a single
 # default case file in the folder
-# cp $CASE_PATH/case_all.sif $CASE_PATH/case.sif
+cp $CASE_PATH/case_all.sif $CASE_PATH/case.sif
 
 
 ORG_DIR=$PWD
@@ -125,7 +126,7 @@ for mesh_level in "${MESH_LEVELS[@]}"; do
 
             start=$(date +%s)
     
-            srun ElmerSolver case.sif -ipar 2 $mesh_level $partitions
+            srun ElmerSolver case.sif -ipar 2 $mesh_level $PARTITIONS
 
             end=$(date +%s)
 
@@ -155,7 +156,7 @@ cd $SCRIPT_PATH
 echo "Plotting scalability..."
 echo
 
-save_as=$SCALE_PATH/$SCALE_NAME.$FORMAT
+save_as=$SCALE_PATH$SCALE_NAME.$FORMAT
 
 python3 plot_scalability_bar.py -p $RET_PATH -f $RET_FILE -s $save_as -t $TOL
 
@@ -172,7 +173,7 @@ for mesh_level in "${MESH_LEVELS[@]}"; do
     echo "Plotting timings with mesh level $mesh_level"
     echo
     
-    save_as=$TIME_PATH/$TIME_NAME-$mesh_level.$FORMAT
+    save_as=$TIME_PATH$TIME_NAME-$mesh_level.$FORMAT
 
     if $VIZ_TOT_TIME; then
 	python3 plot_times.py -p $RET_PATH -f $RET_FILE -s $save_as -t $TOL -v
