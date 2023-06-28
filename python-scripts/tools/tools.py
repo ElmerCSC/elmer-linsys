@@ -20,7 +20,7 @@ def float_mode(vals, tol=10 ** (-6)):
 
         vals = vals[np.invert(within_tol)]
 
-        i++
+        i += 1
 
     return mode
 
