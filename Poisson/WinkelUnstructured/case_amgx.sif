@@ -68,7 +68,7 @@ Solver 2
   Equation = SaveTimings
   Procedure = "SaveData" "SaveScalars"
 
-  Filename = f$ipar(1)$.dat
+  Filename = f_amgx_$ipar(1)$.dat
   Variable 1 = Temperature
   Operator 1 = dofs
   Operator 2 = elements

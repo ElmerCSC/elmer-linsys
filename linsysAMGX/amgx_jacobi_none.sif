@@ -1,4 +1,4 @@
-LinMethod = 51600000
+$LinMethod = 51600000
 $LinStr = "AMGX-BLOCK_JACOBI"
 
   ! Linear System Symmetric =  True

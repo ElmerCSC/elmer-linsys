@@ -24,9 +24,10 @@
             "postsweeps": 2
         }, 
         "monitor_residual": 1, 
-        "gmres_n_restart": 200, 
+        "gmres_n_restart": 200,
+	"subspace_dim_s": 3,
         "convergence": "ABSOLUTE", 
-        "tolerance": 1e-06, 
+        "tolerance": 1e-08, 
         "norm": "L2"
    }
 }

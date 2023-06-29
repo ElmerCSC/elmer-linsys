@@ -9,10 +9,11 @@
         "solver": "BLOCK_JACOBI", 
         "print_solve_stats": 1, 
         "obtain_timings": 1, 
-        "monitor_residual": 1, 
+        "monitor_residual": 1,
+	"subspace_dim_s": 3,
         "convergence": "ABSOLUTE", 
         "scope": "main", 
-        "tolerance": 1e-6, 
+        "tolerance": 1e-8, 
         "norm": "L2"
     }
 }

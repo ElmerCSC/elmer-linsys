@@ -16,7 +16,7 @@
         "monitor_residual": 1, 
         "convergence": "ABSOLUTE", 
         "scope": "main", 
-        "tolerance": 1e-06, 
+        "tolerance": 1e-08, 
         "norm": "L2"
     }
 }
