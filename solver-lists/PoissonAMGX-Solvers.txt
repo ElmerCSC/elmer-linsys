@@ -1,1 +1,4 @@
-linsysAMGX/elmer_amgx_fgrmes.sif
+linsysAMGX/amgx_cg_dilu.sif
+linsysAMGX/amgx_fgmres_dilu.sif
+linsysAMGX/amgx_fgmres_none.sif
+

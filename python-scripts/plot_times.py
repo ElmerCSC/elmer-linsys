@@ -98,7 +98,7 @@ def main():
 
     # Find the median of the norm values and remove the rows where the
     # norm varies significantly
-    mode = float_mode(data[norm_col].values)
+    mode = float_mode(data[norm_col].values, tol=tolerance)
     data = data[np.isclose(data[norm_col], mode, atol=tolerance)]
 
     if len(data) != n_solvers:
