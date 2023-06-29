@@ -1,7 +1,7 @@
 {
     "config_version": 2,
     "solver": {
-        "max_iters": 4000,
+        "max_iters": 5000,
         "preconditioner": {
             "scope": "precond",
             "max_iters": 1,

@@ -1,0 +1,7 @@
+LinMethod = 51600000
+$LinStr = "AMGX-BLOCK_JACOBI"
+
+  ! Linear System Symmetric =  True
+  ! AMGX solver
+  Linear System Solver = AMGX
+  AMGX config = String "config.json"
