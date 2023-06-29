@@ -1,0 +1,7 @@
+linsysAMGX/amgx_cg_dilu.sif
+linsysAMGX/amgx_fgmres_dilu.sif
+linsysAMGX/amgx_fgmres_none.sif
+linsysAMGX/amgx_gmres_amg.sif
+linsysAMGX/amgx_gmres_none.sif
+linsysAMGX/amgx_idr_dilu.sif
+linsysAMGX/amgx_jacobi_none.sif
