@@ -5,7 +5,9 @@
             "solver": "AMG", 
             "smoother": {
                 "scope": "jacobi", 
-                "solver": "BLOCK_JACOBI", 
+                "solver": "BLOCK_JACOBI",
+		"monitor_residual": 0, 
+                "print_solve_stats": 0
             }, 
             "print_solve_stats": 0, 
             "interpolator": "D2",
