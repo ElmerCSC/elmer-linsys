@@ -1,0 +1,20 @@
+{
+    "config_version": 2, 
+    "solver": {
+	"max_iters": 5000
+        "preconditioner": {
+            "scope": "precond", 
+            "solver": "NOSOLVER"
+        }, 
+        "use_scalar_norm": 1, 
+        "solver": "PBICGSTAB",
+	"subspace_dim_s": 3,
+        "print_solve_stats": 1, 
+        "obtain_timings": 1, 
+        "monitor_residual": 1, 
+        "convergence": "ABSOLUTE", 
+        "scope": "main", 
+        "tolerance": 1e-08, 
+        "norm": "L2"
+    }
+}
