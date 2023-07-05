@@ -11,7 +11,7 @@ Linear System Abort Not Converged = True
 Linear System Residual Output = 20
 Linear System Preconditioning = "boomeramg"
 
-BoomerAMG Relax Type = Integer 3
+BoomerAMG Relax Type = Integer 2
 BoomerAMG Coarsen Type = Integer 0
 BoomerAMG Num Sweeps = Integer 1
 Boomeramg Max Levels = Integer 25
