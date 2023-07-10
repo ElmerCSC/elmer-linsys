@@ -1,7 +1,7 @@
 # Electrostatics problem with two conducting balls
 
 
-![Problem Visualization](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Electrostatics-CapacitanceOfTwoBalls/electrostatics_capacitanceOfTwoBalls.png?raw=true)
+![Problem Visualization](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Electrostatics-CapacitanceOfTwoBalls/electrostatics-capacitanceOfTwoBalls.png?raw=true)
 
 
 Spherical approximations are a classic in electromagnetics and thus a
