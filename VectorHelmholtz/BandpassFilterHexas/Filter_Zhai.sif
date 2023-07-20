@@ -1,0 +1,142 @@
+Header
+  CHECK KEYWORDS Warn
+!  Mesh DB "mesh" "Hl_Filter_Zhai_a08"
+! This is an alternative mesh
+! >ElmerGrid 1 2 filter.grd
+  Mesh DB "." "filter"
+  Include Path ""
+  Results Directory "res"
+End
+
+!$te = 151
+!$fa = 35.0e9
+!$fe = 38.0e9
+!$a = 25.4e-03*0.28
+!$b = a/2
+!$c0 = 1/sqrt(8.854e-12*4.0*pi*1e-7)
+!$kc=pi/a
+!$df=(fe-fa)/(te-1.0)
+!$omg = 2.0*pi*(df*(time-1.0)+fa)
+!$k0 = omg/c0
+
+
+
+Simulation
+  Max Output Level = 5
+  Coordinate System = Cartesian
+
+! When using the filter.grd file that is in different cordinate system
+  Coordinate Mapping(3) = 2 3 1
+  Coordinate Scaling = 1.0e-3
+
+  Simulation Type = Scanning
+  Steady State Max Iterations = 1
+  Output Intervals = 1
+  Timestepping Method = BDF
+  BDF Order = 1
+
+$ te = 1 !151
+  Timestep intervals = $ te
+
+  Filter fa = Real 35.0e9
+  Filter fe = Real 38.0e9
+  Filter a = Real $25.4e-03*0.28
+
+  Wave Length = Real 1.0e-8
+End
+
+Constants
+  Stefan Boltzmann = 5.67e-08
+  Permittivity of Vacuum = 8.8542e-12
+  Boltzmann Constant = 1.3807e-23
+End
+
+Body 1
+  Target Bodies(1) = 1
+  Name = "Body 1"
+  Equation = 1
+  Material = 1
+End
+
+Solver 1
+  Equation = Vector Helmholtz Equation
+  Procedure = "VectorHelmholtz" "VectorHelmholtzSolver"
+  Variable = E[E re:1 E im:1]
+
+!  Linear System Preconditioning Damp Coefficient im = 1.0
+!  Optimize Bandwidth = True
+  Nonlinear System Max Iterations = 1
+  
+!  Linear System Row Equilibration = True
+!  Quadratic Approximation = Logical True ! piola automatically follows 2nd order
+  include linsys.sif
+
+  Linear System Convergence Tolerance = 1.0e-7
+End
+
+Solver 2
+  Equation = Vector Helmholtz Post Process
+  Calculate Magnetic Field Strength = True
+  Calculate Electric Field = True
+  Calculate Poynting Vector = False
+  Calculate Energy Functional = True
+  Procedure = "VectorHelmholtz" "VectorHelmholtzCalcFields"
+  Optimize Bandwidth = True
+  Steady State Convergence Tolerance = 1.0e-5
+
+  Calculate Nodal Fields = False
+  Calculate Elemental Fields = True
+End
+
+Solver 3
+  Filename = "f1.dat"
+  Exec Solver = after timestep
+  Equation = SaveScalars
+  Procedure = "SaveData" "SaveScalars"
+End
+
+Solver 4
+  Exec Solver = after timestep
+  Equation = "result output"
+  Procedure = "ResultOutputSolve" "ResultOutputSolver"
+  Output File Name = "case"
+  Vtu Format = Logical True
+  Save geometry Ids = True
+End
+	
+Equation 1
+  Name = "Equation 1"
+  Angular Frequency = Variable "time"
+    Real Procedure "EMParam_WR28" "omega"
+  Active Solvers(4) = 1 2 3 4
+End
+
+Material 1
+  Name = "Material 1"
+  Relative Permittivity = 1.0
+  Relative Permeability = 1.0
+End
+
+Boundary Condition 1
+! The BCs 4 & 5 are only for the filter.grd
+  Target Boundaries(3) = 3 4 5
+  Name = "PEC"
+  E re {e} = 0.0
+  E im {e} = 0.0
+End
+
+Boundary Condition 2
+  Target Boundaries(1) = 1
+  Name = "Inport"
+  Magnetic Boundary Load 2 = Variable "time"
+    Real Procedure "EMParam_WR28" "MagnBndLoad"
+  Electric Robin Coefficient im = Variable "time"
+    Real Procedure "EMParam_WR28" "betaNull"
+End
+
+Boundary Condition 3
+  Target Boundaries(1) = 2
+  Name = "Outport"
+  Electric Robin Coefficient im = Variable "time"
+    Real Procedure "EMParam_WR28" "betaNull"
+End
