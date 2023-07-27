@@ -34,12 +34,16 @@ echo "running OpenMP on $SLURM_CPUS_PER_TASK"
 #export KMP_DETERMINISTIC_REDUCTION=yes
 
 ###### enable CSC provided modules #########
-module use /appl/local/csc/modulefiles
+ml use /appl/local/csc/modulefiles
+# this loads the spack-PrgEnv-gnu cray-libsci (BLAS, LAPACK) version
+###### best to use this for audits! #########
+ml use /appl/lumi/spack/23.03/0.19.2/share/spack/modules/linux-sles15-zen2
+ml use /appl/local/csc/soft/eng/elmer/spack/23.03/0.19.2/modules/tcl/linux-sles15-zen2/
+ml load elmer/gcc-spack
 ###### this loads the container version of Elmer
 # module load elmer/latest
 ###### this loads the PregEnv/gnu version ###
 ###### (using cray-libsci (BLAS, LAPACK)
-###### best to use this for audits! #########
-module load elmer/gcc-cray
+#module load elmer/gcc-cray
 ###### make it so! ######### 
 srun ElmerSolver case.sif
