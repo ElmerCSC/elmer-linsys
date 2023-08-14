@@ -1,0 +1,8 @@
+linsys/direct_MUMPS.sif
+linsys/elmer_iter_BiCGStab2_ILU0.sif
+linsys/elmer_iter_BiCGStab2_none.sif
+linsys/elmer_iter_Idrs5_ILU0.sif
+linsys/hypre_BiCGStab_ILU0.sif
+linsys/hypre_BiCGStab_none.sif
+linsys/hypre_BiCGStab_BoomerAMG_wo_scaling.sif
+linsys/hypre_BoomerAMG.sif
