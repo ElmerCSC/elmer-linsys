@@ -29,6 +29,9 @@ partition_col = "partitions"  # The number of partitions used
 dof_col = "dofs"  # The number of degrees of freedom
 mesh_level_col = "expression"  # The used mesh level
 
+# Predefined tolerance used in float mode etc.
+tolerance = 10 ** (-6)
+
 # Predefined .dat files that the code will look for if nothing is passed as argument
 dat_filename = "f.dat"
 
@@ -62,14 +65,15 @@ def failed_solvers(data, tol):
         temp = temp[~np.isclose(temp[norm_col], mode, atol=tol)]
         ret += temp['Solver'].values.tolist()
 
-    return ret
+    return list(set(ret))  # Return just the unique values
 
 
 def main():
-    global dat_filename, time_col, norm_col, partition_col, dof_col, mesh_level_col
+    global time_col, norm_col, partition_col, dof_col, mesh_level_col
+    global dat_filename, tolerance
+
     ignore_mesh_level = None
     save_as = None
-    tolerance = 10 ** (-6)
     
     if len(sys.argv) > 1:
         args = parse_cmd()
@@ -103,12 +107,15 @@ def main():
     data.columns = column_names
     data['Solver'] = solvers
 
+    min_dof = data[dof_col].min()
+    max_dof = data[dof_col].max()
+
     # Drop the row if the solver failed
-    remove_solvers = list(set(failed_solvers(data, tolerance)))
+    remove_solvers = failed_solvers(data, tolerance)
 
     if len(remove_solvers) != 0:
         data = data[~data['Solver'].isin(remove_solvers)]
-        print(f"WARNING: Solvers: {', '.join(remove_solvers)} had incorrect solution")
+        print(f"WARNING: Solver(s): {', '.join(remove_solvers)} had incorrect solution")
 
     grouped = data.groupby('Solver', group_keys=True).apply(lambda x: x)
 
@@ -119,8 +126,8 @@ def main():
 
         temp = grouped[grouped['Solver'] == solver]
         
-        times = temp[time_col].values.tolist()
-        dofs = temp[dof_col].values / 1_000_000  # Unit should be 1M dofs
+        times = temp[time_col].values
+        dofs = temp[dof_col].values #  / 1_000_000  # Unit should be 1M dofs
 
         if ignore_mesh_level is not None and max(temp[mesh_level_col].values) < ignore_mesh_level:
             continue
@@ -138,12 +145,12 @@ def main():
     zipped.sort(key=lambda tup: tup[1])
 
     # Plot the coefs as a barplot
-    fig, ax = plt.subplots(figsize=(14, 8))
+    fig, ax = plt.subplots(figsize=(12, 6))
     bars = ax.barh([solver for solver, coef in zipped], [coef for solver, coef in zipped])
     ax.bar_label(bars)
     ax.set_ylabel("Solver")
     ax.set_xlabel(f"$b$ solved from: $t = a \cdot  n ^ b$")
-    ax.set_title(f"Scaling coefs for {'-'.join(os.getcwd().split('/')[-3:-1])} ({data[partition_col][0]} partitions)")
+    ax.set_title(f"Scaling coefs for {'-'.join(os.getcwd().split('/')[-3:-1])} with DOFs {min_dof}-{max_dof} ({data[partition_col].iloc[0]} partitions)")
 
     plt.tight_layout()
 
