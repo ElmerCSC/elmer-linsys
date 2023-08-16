@@ -31,9 +31,13 @@ tot_time_col = "value: cpu time"  # Total time
 norm_col = "norm"  # The norm of interest
 partition_col = "partitions"  # The number of partitions used
 mesh_level_col = "expression"  # The used mesh level
+dof_col = "dofs"  # The number of degrees of freedom
 
 # Predefined .dat files that the code will look for if nothing is passed as argument
 dat_filename = "f.dat"
+
+# Predefined tolerance used in float mode and other functions
+tolerance = 10 ** (-6)
 
 # Change directory to predefined location from where the results can be read
 # (in this case WinkelStructed/results)
@@ -46,11 +50,12 @@ os.chdir('/'.join(cwd_arr))
 
 
 def main():
-    global dat_filename, viz_total_time, time_col, norm_col, partition_col, mesh_level_col, tot_time_col
-    mesh_level = None
-    viz_total_time = None
-    save_as = None
-    tolerance = 10 ** (-6)
+    global time_col, norm_col, partition_col, mesh_level_col, tot_time_col, dof_col
+    global dat_filename, viz_total_time, tolerance
+    
+    mesh_level = None  # Specifies the mesh level of which results are plotted
+    viz_total_time = None  # Flag telling if total times should be plotted as well
+    save_as = None  # Path to where the figure should be saved
     
     if len(sys.argv) > 1:
         args = parse_cmd()
@@ -82,6 +87,7 @@ def main():
     norm_col = [s for s in column_names if norm_col in s][0]
     partition_col = [s for s in column_names if partition_col in s][0]
     mesh_level_col = [s for s in column_names if mesh_level_col in s][0]
+    dof_col = [s for s in column_names if dof_col in s][0]
 
     data.columns = column_names
     data['Solver'] = solvers
@@ -93,27 +99,29 @@ def main():
 
     data = data[data[mesh_level_col] == float(mesh_level)]
 
-    solvers = data['Solver'].values.tolist()
+    dofs = data[dof_col].iloc[0]
+
+    solvers = data['Solver'].values
     n_solvers = len(solvers)
 
-    # Find the median of the norm values and remove the rows where the
+    # Find the mode of the norm values and remove the rows where the
     # norm varies significantly
     mode = float_mode(data[norm_col].values, tol=tolerance)
     data = data[np.isclose(data[norm_col], mode, atol=tolerance)]
 
     if len(data) != n_solvers:
-        print(f"WARNING: Solvers: {', '.join(list(set(solvers).difference(set(data['Solver'].values.tolist()))))} had incorrect solution")
+        print(f"WARNING: Solver(s): {', '.join(list(set(solvers).difference(set(data['Solver'].values.tolist()))))} had incorrect solution")
 
     data.sort_values(by=[time_col], ascending=True, inplace=True)
 
     use_times = data[time_col].values
     total_times = data[tot_time_col].values
-    solvers = data['Solver'].values.tolist()
+    solvers = data['Solver'].values
 
     y_axis = np.linspace(0, len(solvers), len(solvers))
 
     # Plot the times as a barplot
-    fig, ax = plt.subplots(figsize=(14, 8))
+    fig, ax = plt.subplots(figsize=(12, 6))
 
     if viz_total_time:
         total_time_bars = ax.barh(y_axis + 0.2, total_times, 0.4, label=tot_time_col)
@@ -122,13 +130,13 @@ def main():
         ax.bar_label(total_time_bars)
 
     else:
-        use_time_bars = ax.barh(y_axis, use_times, label=tot_time_col)
+        use_time_bars = ax.barh(y_axis, use_times, label=time_col)
         ax.bar_label(use_time_bars)
 
     ax.set_yticks(y_axis, solvers)
     ax.set_ylabel("Solver")
     ax.set_xlabel("Time (s)")
-    ax.set_title(f"Runtimes for {'-'.join(os.getcwd().split('/')[-3:-1])} with Mesh Level: {int(mesh_level)} ({data[partition_col].iloc[0]} partitions)")
+    ax.set_title(f"Runtimes for {'-'.join(os.getcwd().split('/')[-3:-1])} with DOFs: {dofs} ({data[partition_col].iloc[0]} partitions)")
     ax.legend(loc='lower right')
 
     plt.tight_layout()
