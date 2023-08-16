@@ -14,6 +14,8 @@ def parse_cmd():
     parser.add_argument('-s', '--save_as', type=str)
     parser.add_argument('-t', '--tolerance', type=float)
     parser.add_argument('-v', '--viz_total_time', action="store_true")
+    parser.add_argument('-r', '--nrows', type=int)
+    parser.add_argument('-c', '--ncols', type=int)
     
     args = parser.parse_args()
 
