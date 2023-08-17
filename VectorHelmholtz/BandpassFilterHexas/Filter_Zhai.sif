@@ -2,8 +2,10 @@ Header
   CHECK KEYWORDS Warn
 !  Mesh DB "mesh" "Hl_Filter_Zhai_a08"
 ! This is an alternative mesh
-! >ElmerGrid 1 2 filter.grd
-  Mesh DB "." "filter"
+! >ElmerGrid 1 2 filter-simpler.grd
+! Note that mesh "filter-simpler" has been modified such that the very narrow
+! elements are eliminated making the problem slightly different!
+  Mesh DB "." "filter-simpler"
   Include Path ""
   Results Directory "res"
 End
