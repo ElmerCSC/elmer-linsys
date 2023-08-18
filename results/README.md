@@ -116,7 +116,7 @@ When comparing the same method across implementations there might be some differ
 
 The benchmarks in this directory mainly look into two factors: the total runtimes of the solvers and the algorithmic scaling of the solvers. The algorithmic scaling is generally formalized in equation:
 ```math
-t = \alpha n^{\beta
+t = \alpha n^{\beta}
 ```
 where the $t$ is the runtime, $n$ the dimension of the system, $\alpha$ the constant coefficient and $\beta$ the scaling coefficient. Looking at the runtimes for different sized systems we can get an idea for $/alpha$. However, it is the $/beta$ that has greater impact when the problem is scaled onto thousands of cores. Hence, it is separately computed by fitting a curve of the form associated with algorithmic scaling to results on different sized system.
 
