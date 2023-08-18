@@ -43,7 +43,7 @@ Note that if $A$ is symmetric and positive definite, instead of LU-decomposition
 
 Krylov subspace methods are some of the most well known and used iterative linear solvers. These include solvers such as conjugate gradient method, biconjugate gradient stabilized method and induced dimension reduction method.
 
-The Krylov subspace in Krylov subspace methods refers to the order-$r$ Krylov subspace defined as:
+The Krylov subspace in Krylov subspace methods refers to the $\text{order-}r$ Krylov subspace defined as:
 ```math
 \mathcal{K}_r(A, b) = \text{span}\{b, Ab, A^2b, ..., A^{r-1}b\}
 ```
@@ -118,6 +118,6 @@ The benchmarks in this directory mainly look into two factors: the total runtime
 ```math
 t = \alpha n^{\beta}
 ```
-where the $t$ is the runtime, $n$ the dimension of the system, $\alpha$ the constant coefficient and $\beta$ the scaling coefficient. Looking at the runtimes for different sized systems we can get an idea for $/alpha$. However, it is the $/beta$ that has greater impact when the problem is scaled onto thousands of cores. Hence, it is separately computed by fitting a curve of the form associated with algorithmic scaling to results on different sized system.
+where the $t$ is the runtime, $n$ the dimension of the system, $\alpha$ the constant coefficient and $\beta$ the scaling coefficient. Looking at the runtimes for different sized systems we can get an idea for $\alpha$. However, it is the $\beta$ that has greater impact when the problem is scaled onto thousands of cores. Hence, it is separately computed by fitting a curve of the form associated with algorithmic scaling to results on different sized system.
 
 Both the runtimes and $\beta$ are included as barplots in the problem specific directories.
