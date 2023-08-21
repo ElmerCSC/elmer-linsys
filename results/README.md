@@ -5,14 +5,70 @@ As with many computational methods FEM at it's core requires solving a large _sp
 The purpose of this directory is to gather together the results from some simple benchmark cases for multiphysics problems solvable with Elmer. More information on the specific cases can be found within the associated directories. The purpose of this markdown is to provide some general information about linear solvers and when they could be applicable.
 
 # Table of contents
-1. [Linear systems](#linsys)
-2. [Linear solver families](#families)
+1. [General](#general)
+2. [Benchmarking](#benchmarking)
+3. [Tables](#tables)
+   1. [Solver properties](#solver_props)
+   2. [Problem properties](#problem_props)
+4. [Linear systems](#linsys)
+5. [Linear solver families](#families)
    1. [Direct methods](#direct)
    2. [Krylov subspace methods](#krylov)
    3. [Multigrid methods](#multigrid)
    4. [Preconditioning](#preconditioning)
    5. [Other implementations](#others)
-3. [Generally about benchmarking](#benchmarking)
+
+## General <a name="general"></a>
+
+This markdown has quite a lot of information so depending on the readers goals some sections could be skipped. Ideally, everyone who is choosing a linear solver should read Sections [1](#general)-[3](#tables). Of these the most crucial is the Section [3](#tables) as that outlines both with which matrix types a given linear solver would work and what types of characteristic matrices each outlined problem forms. This at least should guide the reader in the choice of what _not_ to choose as the linear solver, but isn't enough to find the go to solver.
+
+Sections [4](#linsys)-[5](#families) provide extra information on the solvers and their properties and can be skipped if that is not of interest. These sections are by no means mathematically rigorous, but require a running understanding of numerical linear algebra.
+
+## Benchmarking <a name="benchmarking"></a>
+
+The benchmarks in this directory mainly looks into two factors: the total runtimes of the solvers and the algorithmic scaling of the solvers. The algorithmic scaling is generally formalized in equation:
+```math
+t = \alpha n^{\beta}
+```
+where the $t$ is the runtime, $n$ the dimension of the system, $\alpha$ the constant coefficient and $\beta$ the scaling coefficient. Looking at the runtimes for different sized systems we can get an idea for $\alpha$. However, it is the $\beta$ that has greater impact when the problem is scaled onto thousands of cores. Hence, it is separately computed by fitting a curve of the form associated with algorithmic scaling to results on different sized system.
+
+Both the runtimes and $\beta$ are included as barplots in the problem specific directories. The total runtimes are plotted with the $\mathbb{plot_runtimes.py}$ script that can be found in $\mathbb{elmer-linsys/python-scripts}$ directory. Likewise, the scaling coefficients are can be plotted with the $\mathbb{plot_scaling_coefs_bar.py}$ script in the $\mathbb{elmer-linsys/python-scripts}$ directory. There are also some additional scripts for plotting different things. To learn about these please refer to the docstring found at the beginning of the script files.
+
+## Tables <a name="tables"></a>
+
+### Solver properties <a name="solver_props"></a>
+
+Following table contains some properties for an assortment of linear solvers and preconditioners. This list is not exhaustive, but outlines the most common choices. In the table "Pos. Sem-Def" is short for positive semi-definite and identically "Pos. Def." is short for positive definite. If the *-mark is in brackets the property is not strictly necessary, but highly recommended. Also note that as some of these properties are more restrictive than others (e.g. positive definite automatically means invertible) then also the superseded properties are marked.
+
+| Solver | Square | Symmetric | Invertible | Pos. Sem-Def. | Pos. Def. |
+| :----- | :----: | :-------: | :--------: | :-----------: | :-------: |
+| CG     |    *   |     *     |     *      |      *        |     *     |
+| LU     |    *   |           |     *      |               |           |
+| Cholesky |  *   |     *     |     *      |      *        |     *     |
+| BiCGStab(l) | * |           |            |               |           |
+| Idrs(s) |  *    |           |            |               |           |
+| QMR     |  *    |           |            |               |           |
+| MINRES  |  *    |     *     |            |               |           |
+| GMRES   |  *    |           |            |               |           |
+| AMG     |  *    |   (*)     |            |     (*)       |           |
+| ILU precond. |* |           |     *      |               |           |
+| Vanka precond. | * |        |     *      |               |           |
+| AMG precond. |* |   (*)     |            |     (*)       |           |
+
+### Problem properies <a name="problem_props"></a>
+
+Following table contains some properties for an assortment problem types solvable with Elmer. This list is also not exhaustive, but outlines some generally used ones. Same abbreviations etc. hold as in the case of table in Section [1](#solver_props) except for *-mark in brackets, which is used to indicate uncertainty in the property holding.
+
+| Problem | Square | Symmetric | Invertible | Pos. Sem-Def. | Pos. Def. |
+| :------ | :----: | :-------: | :--------: | :-----------: | :-------: |
+| Poisson |   *    |     *     |     *      |      *        |     *     |
+| Lin. Elasticity | * |  *     |     *      |      *        |     *     |
+| Electrostatics | *  |  *     |     *      |      *        |     *     |
+| Magnetostatics | *  |  *     |            |     (*)       |           |
+| Incom. Stokes (block) | * | * |    *      |      *        |     *     |
+| VectorHelmholtz | * |  *     |    *       |     (*)       |           |
+
+Note that these are mainly based on the results of the benchmark tests. With a more complex meshes or boundary conditions the problem properties might change.
 
 ## Linear systems <a name="linsys"></a>
 
@@ -121,13 +177,3 @@ Linear System Preconditioning = ILU0  ! vanka, ...
 Note that the above sections only really discuss Elmers internal implementations of linear solvers. However, Elmer also works with some external implementations including the Hypre library, Trilinos library and AmgX library. To utilize these some other keywords might be needed.
 
 When comparing the same method across implementations there might be some differences in performance. This can be caused by differences in low-level optimizations or some more fundamental factors. For example there is a difference in how Elmers internal ILU factorization is computed to how the same is done in Hypres implementation, in that Elmer does the factorization partition-wise, while Hypre does it in a more "textbook" way for the full matrix $A$. Both have their advantages. Doing ILU factorization partition-wise allows for parallelization unlike the default way, but might lead to a worse approximation.
-
-## Generally about benchmarking <a name="benchmarking"></a>
-
-The benchmarks in this directory mainly look into two factors: the total runtimes of the solvers and the algorithmic scaling of the solvers. The algorithmic scaling is generally formalized in equation:
-```math
-t = \alpha n^{\beta}
-```
-where the $t$ is the runtime, $n$ the dimension of the system, $\alpha$ the constant coefficient and $\beta$ the scaling coefficient. Looking at the runtimes for different sized systems we can get an idea for $\alpha$. However, it is the $\beta$ that has greater impact when the problem is scaled onto thousands of cores. Hence, it is separately computed by fitting a curve of the form associated with algorithmic scaling to results on different sized system.
-
-Both the runtimes and $\beta$ are included as barplots in the problem specific directories.
