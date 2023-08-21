@@ -32,7 +32,7 @@ t = \alpha n^{\beta}
 ```
 where the $t$ is the runtime, $n$ the dimension of the system, $\alpha$ the constant coefficient and $\beta$ the scaling coefficient. Looking at the runtimes for different sized systems we can get an idea for $\alpha$. However, it is the $\beta$ that has greater impact when the problem is scaled onto thousands of cores. Hence, it is separately computed by fitting a curve of the form associated with algorithmic scaling to results on different sized system.
 
-Both the runtimes and $\beta$ are included as barplots in the problem specific directories. The total runtimes are plotted with the $\texttt{plot}$$\_$$\texttt{runtimes.py}$ script that can be found in $\texttt{elmer-linsys/python-scripts}$ directory. Likewise, the scaling coefficients are can be plotted with the $\texttt{plot}$$\_$$\texttt{scalability}$$\_$$\texttt{bar.py}$ script in the $\texttt{elmer-linsys/python-scripts}$ directory. There are also some additional scripts for plotting different things. To learn about these please refer to the docstring found at the beginning of the script files.
+Both the runtimes and $\beta$ are included as barplots in the problem specific directories. The total runtimes are plotted with the "plot_runtimes.py" script that can be found in "elmer-linsys/python-scripts" directory. Likewise, the scaling coefficients are can be plotted with the "plot_scalability_bar.py" script in the "elmer-linsys/python-scripts" directory. There are also some additional scripts for plotting different things. To learn about these please refer to the docstring found at the beginning of the script files.
 
 ## Tables <a name="tables"></a>
 
