@@ -4,7 +4,17 @@ As with many computational methods FEM at it's core requires solving a large _sp
 
 The purpose of this directory is to gather together the results from some simple benchmark cases for multiphysics problems solvable with Elmer. More information on the specific cases can be found within the associated directories. The purpose of this markdown is to provide some general information about linear solvers and when they could be applicable.
 
-## Linear systems
+# Table of contents
+1. [Linear systems](#linsys)
+2. [Linear solver families](#families)
+   1. [Direct methods](#direct)
+   2. [Krylov subspace methods](#krylov)
+   3. [Multigrid methods](#multigrid)
+   4. [Preconditioning](#preconditioning)
+   5. [Other implementations](#others)
+3. [Generally about benchmarking](#benchmarking)
+
+## Linear systems <a name="linsys"></a>
 
 The linear systems of equations are commonly referred to as:
 ```math
@@ -12,11 +22,11 @@ Ax = b
 ```
 where $A$ is the coefficient matrix, $b$ the right-hand side vector and $x$ the vector we are solving for. Naive approach would be to invert the matrix $A$, but this is in practice never done. There are two reasons for it. Firstly, inverting a square matrix with e.g. Gaussian elimination is a $O(n^3)$ time operation, which for large $n$ is unfeasible. Secondly, number of non-zeros (and thus the memory requirements) of the inverse matrix are most likely much greater than the original one. Hence some more eloquent methods are required.
 
-## Linear solver families
+## Linear solver families <a name="families"></a>
 
 Linear solvers can be grouped together based on some fundamental properties. However, which properties are chosen for said groupings are a bit arbitrary. Common groupings are e.g. _direct methods_, _Krylov subspace methods_ and _multigrid methods_. We will outline some basic properties for each.
 
-### Direct methods
+### Direct methods <a name="direct"></a>
 
 As their name suggests direct methods find an direct (rather than iterative) solution to the linear system. However, this is done through decompositions instead of the matrix inverse. For general invertible matrices the most common decomposition is the LU-decomposition:
 ```math
@@ -39,7 +49,7 @@ in the problem case file.
 
 Note that if $A$ is symmetric and positive definite, instead of LU-decomposition based direct methods, one should use Cholesky decomposition based methods. These find a decomposition $A = LL^T$. Fundamentally this is very similar, but generally Cholesky has better asymptotic complexity than LU.
 
-### Krylov subspace methods
+### Krylov subspace methods <a name="krylov"></a>
 
 Krylov subspace methods are some of the most well known and used iterative linear solvers. These include solvers such as conjugate gradient method, biconjugate gradient stabilized method and induced dimension reduction method.
 
@@ -51,7 +61,7 @@ This is relevant as each iteration of a Krylov subspace method involves finding 
 
 The reason why a large assortment of Krylov subspace methods exists is that the conjugate gradient method requires quite strict assumptions of $A$ to work. This is because conjugate gradient method doesn't solve $Ax = b$ itself, but finds the minimizer $x$ to an _energy function_:
 ```math
-J(x) = \frac{1}{2}x^TAx - b^T
+J(x) = \frac{1}{2}x^TAx - x^Tb
 ```
 It can be shown that the solution $x$ to the linear system and the minimizer $x$ to the energy function are the same if $A$ is symmetric and positive definite (s.p.d.). Variants of the conjugate gradient method such as the biconjugate gradient stabilized method are designed to work with indefinite matrices as well.
 
@@ -70,7 +80,7 @@ Idrs Parameter = 5  ! May be specified when using Idrs
 ...
 ```
 
-### Multigrid methods
+### Multigrid methods <a name="multigrid"></a>
 
 Multigrid methods are a newer class of solvers that are especially designed for solving discretized differential equations. They accomplish this by recursively doing coarse grid approximations on a set of coarser meshes of the problem. That is at the base case (with the coarsest mesh) the associated system is solved with a direct method. This solution of the base case is then used to find an approximation for the solution of the one finer mesh via coarse mesh correction. The fine approximations are then recursively used to find approximations on ever finer meshes until the original problem is reached. This is not an exhaustive explanation of the method. For more information see e.g. the ElmerSolver manual section 4.4.
 
@@ -96,7 +106,7 @@ mglowest: Linear System Abort Not Converged = False
 ...
 ```
 
-### Preconditioning
+### Preconditioning <a name="preconditioning"></a>
 
 For many iterative methods the rate of convergence is tied to the condition number $\kappa$ of the coefficient matrix $A$. Generally, for larger $\kappa(A)$ the convergence is slower. Thus, some methods attempt to find matrices $M$ such that $\kappa(MA) < \kappa(A)$. Here the matrix $M$ is known as the _preconditioner_ and is usually an approximation of the inverse of $A$.
 
@@ -106,13 +116,13 @@ There are many preconditioning methods available in Elmer including variants of 
 Linear System Preconditioning = ILU0  ! vanka, ...
 ```
 
-### Other implementations
+### Other implementations <a name="others"></a>
 
 Note that the above sections only really discuss Elmers internal implementations of linear solvers. However, Elmer also works with some external implementations including the Hypre library, Trilinos library and AmgX library. To utilize these some other keywords might be needed.
 
 When comparing the same method across implementations there might be some differences in performance. This can be caused by differences in low-level optimizations or some more fundamental factors. For example there is a difference in how Elmers internal ILU factorization is computed to how the same is done in Hypres implementation, in that Elmer does the factorization partition-wise, while Hypre does it in a more "textbook" way for the full matrix $A$. Both have their advantages. Doing ILU factorization partition-wise allows for parallelization unlike the default way, but might lead to a worse approximation.
 
-## Generally about benchmarking
+## Generally about benchmarking <a name="benchmarking"></a>
 
 The benchmarks in this directory mainly look into two factors: the total runtimes of the solvers and the algorithmic scaling of the solvers. The algorithmic scaling is generally formalized in equation:
 ```math
