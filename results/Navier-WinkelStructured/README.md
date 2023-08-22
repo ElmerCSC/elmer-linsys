@@ -33,7 +33,7 @@ The support for Nvidia's AmgX library was recently added to Elmer and allows par
 Some runtimes acquired from running the case on a single Mahti GPU node with four partitions can be seen below.
 
 ![Runtimes AmgX small](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Navier-WinkelStructured/runtimes_amgx_ML1.png?raw=true)
-![Runtimes AmgX large](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Navier-Structured/runtimes_amgx_ML3.png?raw=true)
+![Runtimes AmgX large](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Navier-WinkelStructured/runtimes_amgx_ML3.png?raw=true)
 
 Based on this (very small) sample it seems that conjugate gradient with DILU (diagonally-based incomplete LU factorization) performs best. However, looking at the scalability plot below it doesn't scale best.
 
