@@ -25,9 +25,9 @@ To automate the benchmarking as thoroughly as possible there are available some 
 These bash scripts will do everything from partitioning the mesh to needed amount (this is currently not super robust) and running ElmerSolver on specified case with specified solver to plotting the results. For the automated scipt to be able to control mesh size and wanted solver the case file for the problem will have to be designed with that in mind. ElmerSolver implements two ways to help with this.
 
 Firstly, one can include contents of another file into the case file with the "include" keyword. This is currently used to add the information of the wanted solver to the case file. That is the case file should contain the line
-´´´fortran
+```fortran
 include "linsys.sif"
-´´´
+```
 at the valid Solver section, which is to be benchmarked. The bash script will copy the contents of a specified solver file from e.g. the "linsys" directory into the "linsys.sif" file in the case directory so that the correct solver is readily available for ElmerSolver.
 
 Secondly, ElmerSolver allows passing "command line arguments" into the case file. To pass integer values into the case file one can use the -ipar flag. An example of how to use this is given below.
@@ -39,18 +39,18 @@ Notice that to pass 2 wanted integer values (stored in variables n and m in the 
 Mesh Levels = $ipar(0)
 ```
 This causes ElmerSolver to do simple mesh multiplication for generating a finer mesh. However, if this causes stability issues one could generate multiple different sized meshes using a third party software before hand and store these e.g. as "mesh_1", "mesh_2" etc. Then in the Header section one could specify
-´´´fortran
+```fortran
 Mesh DB "." "mesh_"$ipar(0)$
-´´´
+```
 To choose the one with wanted size.
 The number of partitions is not strictly necessary as it is only really used for naming the file into which the results are saved. This could be replaced with the line
-´´´fortran
+```fortran
 Partition Numbering = Logical True
-´´´
+```
 in the valid solver.
 
 The above mentioned valid solver is also required from the user. This is generally of form
-´´´fortran
+```fortran
 Solver <add solver number here>
   Equation = SaveTimings
   Procedure = "SaveData" "SaveScalars"
@@ -74,16 +74,16 @@ Solver <add solver number here>
   File Append = True
   Parallel Reduce = True
 End
-´´´
+```
 For the "SaveTimings" equation to be able to save the valid timings the lines
-´´´fortran
+```fortran
 Linear System Timing = True
 Solver Timing = True
-´´´
+```
 Should be added to the Solver section of interest.
 
 To plot the found benchmarking results one can use the python scripts available in the "python-scripts" directory. To learn more about how these work reader is referred to the docstrings at the beginning of each script file. However, the scipts use some common third party libraries. These are "numpy", "matplotlib", "pandas" and "scipy". These can be installed with e.g. the pip package manager by stating
-´´´bash
+```bash
 pip install <add the name of the package here>
-´´´
+```
 on the command line.
