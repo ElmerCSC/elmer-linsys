@@ -1,33 +1,26 @@
 # Electrostatics problem with two conducting balls
 
+![Problem Visualization](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Electrostatics-CapacitanceOfTwoBallsH/electrostatics-capacitanceOfTwoBalls.png?raw=true)
 
-![Problem Visualization](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Electrostatics-CapacitanceOfTwoBalls/electrostatics-capacitanceOfTwoBalls.png?raw=true)
+## Problem description
 
+Spherical approximations are a classic in electromagnetism and thus a problem consisting of two balls provides a simple yet insightful example of a electrostatics problem. A very coarse mesh of the problem is visualized above. As this example is very simple it makes it possible for multitude of solvers to converge. Indeed, the coefficient matrix is symmetric and positive definite meaning (theoretically) any choice of solver should work. The shape of the coefficient matrix can be found below.
 
-Spherical approximations are a classic in electromagnetics and thus a
-a problem consisting of two balls provides a simple yet insightful
-example of a electrostatics problem. As this example is very simple
-it makes it possible for multitude of solvers to converge. Indeed,
-the coefficient matrix is symmetric and positive definite since
-conjugate gradient method without preconditioning converges. The
-shape of the coefficient matrix can be found below.
+![Sparsity Structure](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Electrostatics-CapacitanceOfTwoBallsH/sparsity_structure.png?raw=true)
 
+## Results
 
-![Sparsity Structure](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Electrostatics-CapacitanceOfTwoBalls/sparsity_structure.png?raw=true)
+The benchmarks on this problem were only done on a single Mahti node with number of degrees of freedom varying from around 450 000 to around 24 000 000. The runtimes can be found from picture files "runtimes_ML*.png". Runtimes for the smallest and largest runs are visualized below.
 
+![Runtimes small](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Electrostatics-CapacitanceOfTwoBallsH/runtimes_ML2.png?raw=true)
+![Runtimes large](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Electrostatics-CapacitanceOfTwoBallsH/runtimes_ML4.png?raw=true)
 
-Looking at the scalability bar plots we see that some solvers (generally from hypre)
-have a scaling coefficient of less than 1. This shouldn't really be possible and is
-most likely caused by a proportionally significant overhead from finding the
-preconditioner in the smaller cases. The Hypre and Elmer implementations for ILU family
-of preconditioners differs in that Elmer does the preconditioning partitionwise while
-Hypre does it 'properly' with the downside that finding the preconditioner isn't fully
-parallelizable. Similarly the AMG preconditioners most likely have quite a large overhead
-due to the need for solving the coarse problem as an approximation for the fine grid solution.
+The variability seems quite drastic between the fastest and the slowest methods (around 100 fold) in the smallest case, but somewhat evens out when going to the larger runs. This would be indicative of differing scalabilities between the solvers. The scaling coefficients computed for the solvers are found below:
 
-Looking at the runtimes we see that a lot of solvers remain relatively competitive, but there seems to
-be a few choices that are better than others at least in bigger cases. Hypres implementation of BiCGStab
-with BoomerAMG preconditioning seems to win in runtime for larger cases as well as in scalability
-and would be a good choice for larger cases. In smaller cases Elmers BiCGStab and IDRS solvers seem to be
-the fastest. Interestingly, they perform best with ILU1 preconditioner. Out of these IDRS{5} with
-ILU1 preconditioning has scales the best and would be good choice for smaller cases.
+![Scalability single node](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Electrostatics-CapacitanceOfTwoBallsH/scalability_bar_ML2-4.png?raw=true)
+
+## Conclusions
+
+Generally, in the small cases it seems that Elmer's implementations of ILU(n) preconditioned BiCGStab(l) and Idr(s) methods perform best, with almost non-existant differences in the runtimes. When the problem size is increased Hypre's BoomerAMG preconditioned BiCGStab becomes quite significantly faster than the rest. But still e.g. Elmer's Idr(s) method with ILU(1) preconditioning wouldn't be an overly poor choice. An unusual observation is that the ILU(1) preconditioner is competitive if not superior to ILU(0) preconditioner.
+
+Overall, with larger problems it seems that Hypre's BiCGStab with BoomerAMG preconditioning is the obvious choice. It scales way better than Elmer's comparable implementations and has the smallest runtimes when increasing the problem size to that around 24 000 000 degrees of freedom. For smaller cases e.g. Elmer's Idr(s) method with ILU(n) preconditioning could be a good choice, although differences between all of Elmer's ILU(n) preconditioned Krylov subspace methods are quite minor. These methods also remain competitive in single node runs, but if the number of nodes were to be increased they would most likely end up lagging behind.
