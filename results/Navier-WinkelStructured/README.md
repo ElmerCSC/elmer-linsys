@@ -37,6 +37,6 @@ Some runtimes acquired from running the case on a single Mahti GPU node with fou
 
 Based on this (very small) sample it seems that conjugate gradient with DILU (diagonally-based incomplete LU factorization) performs best. However, looking at the scalability plot below it doesn't scale best.
 
-![Scalability AmgX](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Poisson-WinkelUnstructured/scalability_bar_amgx_ML2-4.png?raw=true)
+![Scalability AmgX](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Navier-WinkelStructured/scalability_bar_amgx_ML1-3.png?raw=true)
 
 Interestingly, all of the solvers seem to have a scaling coefficient of less than one. This shouldn't be possible as the ideal case scenario would be linear scaling. The reason for this odd result is most likely a very large overhead from transfering the matrices to the GPUs, which hides the comparably small solving times. This is likely most prevalent in the DILU preconditioned FGMRES method as it has by far the smallest scaling coefficient. It also had the longest runtimes, which is probably the explaining factor.
