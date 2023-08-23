@@ -8,7 +8,7 @@ We are open for ideas what problems should be studied. The test cases should be 
 
 ## Structure
 
-This repository is structured to allow easy automation. Depending on the problem one wants to benchmark it will be found in directory "<problem type>/<geometry>". As an example there exists two separate benchmark cases for the Poisson problem (heat equation). These can be found in the "Poisson" directory. The individual geometries themselves are in directories "WinkelStructured" and "WinkelUnstructured" respectively.
+This repository is structured to allow easy automation. Depending on the problem one wants to benchmark it will be found in directory "[problem type]/[geometry]". As an example there exists two separate benchmark cases for the Poisson problem (heat equation). These can be found in the "Poisson" directory. The individual geometries themselves are in directories "WinkelStructured" and "WinkelUnstructured" respectively.
 
 The test cases themselves are not enough for proper benchmarking, and as the main target for the benchmarks are the different linear solvers these should be readily available. And indeed a large assortment of linear solvers can be found in the "linsys" and "linsysAMGX" directories.
 
