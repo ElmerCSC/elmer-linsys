@@ -12,7 +12,7 @@ This repository is structured to allow easy automation. Depending on the problem
 
 The test cases themselves are not enough for proper benchmarking, and as the main target for the benchmarks are the different linear solvers these should be readily available. And indeed a large assortment of linear solvers can be found in the "linsys" and "linsysAMGX" directories.
 
-However, as depending on the problem at hand one might not want to do the benchmarks with every available solver, there should be some way to "mask out" unwanted solvers. And for this purpose there is the "solver-lists" directory. Every file in this directory should be named in format "<problem type>-Solvers.txt" and in each file should be the paths to the files which describes the _wanted_ solvers for the problem.
+However, as depending on the problem at hand one might not want to do the benchmarks with every available solver, there should be some way to "mask out" unwanted solvers. And for this purpose there is the "solver-lists" directory. Every file in this directory should be named in format "[problem type]-Solvers.txt" and in each file should be the paths to the files which describes the _wanted_ solvers for the problem.
 
 Finally, once the data is available, there should be a way to easily analyze it. For this purpose there is a selection of python scripts available in the "python-scripts" directory.
 
@@ -22,7 +22,7 @@ Some results and analysis for the cases available in this repository can be foun
 
 To automate the benchmarking as thoroughly as possible there are available some bash scripts. Of these the "run_complete.sh" and "run_complete_mahti.sh" are most mature and easiest to use. These function fundamentally the same way, with the only difference being that "run_complete.sh" is meant to be used on a personal computer, while "run_complete_mahti.sh" is primarily designed to be used on Mahti, but should be very easy to modify for any slurm based computer cluster.
 
-These bash scripts will do everything from partitioning the mesh to needed amount (this is currently not super robust) and running ElmerSolver on specified case with specified solver to plotting the results. For the automated scipt to be able to control mesh size and wanted solver the case file for the problem will have to be designed with that in mind. ElmerSolver implements two ways to help with this.
+These bash scripts will do everything from partitioning the mesh to needed amount (this is currently not super robust) and running ElmerSolver on specified case with specified solver to plotting the results. For the automated script to be able to control the mesh size and the wanted solver, the case file for the problem will have to be designed with that in mind. ElmerSolver implements two ways to help with this.
 
 Firstly, one can include contents of another file into the case file with the "include" keyword. This is currently used to add the information of the wanted solver to the case file. That is the case file should contain the line
 ```fortran
@@ -38,7 +38,7 @@ Notice that to pass 2 wanted integer values (stored in variables n and m in the 
 ```fortran
 Mesh Levels = $ipar(0)
 ```
-This causes ElmerSolver to do simple mesh multiplication for generating a finer mesh. However, if this causes stability issues one could generate multiple different sized meshes using a third party software before hand and store these e.g. as "mesh_1", "mesh_2" etc. Then in the Header section one could specify
+This causes ElmerSolver to do simple mesh multiplication for generating a finer mesh. However, if this causes stability issues one could generate multiple different sized meshes using a third party software beforehand and store these e.g. as "mesh_1", "mesh_2" etc. Then in the Header section one could specify
 ```fortran
 Mesh DB "." "mesh_"$ipar(0)$
 ```
@@ -80,7 +80,7 @@ For the "SaveTimings" equation to be able to save the valid timings the lines
 Linear System Timing = True
 Solver Timing = True
 ```
-Should be added to the Solver section of interest.
+Should be added to the Solver section of interest. The variables $LinStr$ and $LinMethod$ should be specified in the solver file and are used to identify solvers in analysis phase.
 
 To plot the found benchmarking results one can use the python scripts available in the "python-scripts" directory. To learn more about how these work reader is referred to the docstrings at the beginning of each script file. However, the scipts use some common third party libraries. These are "numpy", "matplotlib", "pandas" and "scipy". These can be installed with e.g. the pip package manager by stating
 ```bash
