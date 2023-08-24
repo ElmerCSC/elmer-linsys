@@ -32,7 +32,7 @@ at the valid Solver section, which is to be benchmarked. The bash script will co
 
 Secondly, ElmerSolver allows passing "command line arguments" into the case file. To pass integer values into the case file one can use the -ipar flag. An example of how to use this is given below.
 ```bash
-ElmerSolver -ipar 2 $n $m
+ElmerSolver case.sif -ipar 2 $n $m
 ```
 Notice that to pass 2 wanted integer values (stored in variables n and m in the above example) one needs to specify to the -ipar flag as to how many values to expect. Thus, the first argument is the number of values to be passed. This value could be anything, but the automated bash script passes two values. The first of these values is the mesh level that is wanted and second is the number of partitions used. These can then be accessed in the case file with $ipar(0) and $ipar(1) respectively. It is up to the user to specify how the mesh level value is utilized. Natural choice would be to change the Mesh Levels value in the Simulation section with
 ```fortran

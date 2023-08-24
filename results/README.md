@@ -34,6 +34,13 @@ where the $t$ is the runtime, $n$ the dimension of the system, $\alpha$ the cons
 
 Both the runtimes and $\beta$ are included as barplots in the problem specific directories. The total runtimes are plotted with the "plot_runtimes.py" script that can be found in "elmer-linsys/python-scripts" directory. Likewise, the scaling coefficients are can be plotted with the "plot_scalability_bar.py" script in the "elmer-linsys/python-scripts" directory. There are also some additional scripts for plotting different things. To learn about these please refer to the docstring found at the beginning of the script files.
 
+Note that for each problem there exists benchmarks for Elmer's internal CPU based solvers as well as Hypre's CPU based solvers. Additionally, some more case specific benhmarks are available under some of the problem directories. These are listed below.
+
+- Poisson-WinkelUnstructured: AmgX benchmarks
+- Poisson-WinkelUnstructured: BoomerAMG benchmarks
+- Navier-WinkelStructured: AmgX benchmarks
+- VectorHelmholtz-BandpassFilterTets: ILUT benchmarks
+
 ## Tables <a name="tables"></a>
 
 ### Solver properties <a name="solver_props"></a>
