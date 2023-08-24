@@ -1,6 +1,6 @@
 # Vectorial Helmholtz equation on an unstructured bandpass filter
 
-![Problem Visualization](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/VectorHelmholtz-BandpassFilterTets/vectorHelmholtz-bandpassFilter_a08.png?raw=true)
+![Problem Visualization](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/VectorHelmholtz-BandpassFilterTets/vectorHelmholtz-bandpassFilterTets_a08.png?raw=true)
 
 ## Problem description
 
