@@ -23,7 +23,7 @@ from tools.parser import *
 ################# PREDEFINED ####################
 
 # Substrings defining the column names with wanted values
-time_col = "linsys cpu"  # The measured time of interest
+time_col = "linsys cpu time"  # The measured time of interest
 norm_col = "norm"  # The norm of interest
 partition_col = "partitions"  # The number of partitions used
 dof_col = "dofs"  # The number of degrees of freedom

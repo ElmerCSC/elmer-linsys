@@ -30,8 +30,11 @@ time_col = "linsys cpu time"  # The measured time of interest
 tot_time_col = "value: cpu time"  # Total time
 norm_col = "norm"  # The norm of interest
 partition_col = "partitions"  # The number of partitions used
-mesh_level_col = "expression"  # The used mesh level
+mesh_level_col = "expression 1"  # The used mesh level
 dof_col = "dofs"  # The number of degrees of freedom
+
+# Predefine this if P-multigrid was used. Ignore otherwise
+p_level_col = "expression 2"
 
 # Predefined .dat files that the code will look for if nothing is passed as argument
 dat_filename = "f.dat"
@@ -50,7 +53,7 @@ os.chdir('/'.join(cwd_arr))
 
 
 def main():
-    global time_col, norm_col, partition_col, mesh_level_col, tot_time_col, dof_col
+    global time_col, norm_col, partition_col, mesh_level_col, tot_time_col, dof_col, p_level_col
     global dat_filename, viz_total_time, tolerance
     
     mesh_level = None  # Specifies the mesh level of which results are plotted
@@ -91,6 +94,16 @@ def main():
 
     data.columns = column_names
     data['Solver'] = solvers
+
+    # Check for P-values
+    try:
+        p_level_col = [s for s in column_names if p_level_col in s][0]
+    except:
+        pass
+    else:
+        # Add the p-values to solver names
+        data['Solver'] = data['Solver'] + " + P{" + data[p_level_col].astype(str) + "}"
+        
 
     # Find the most common mesh level value and drop all rows with different mesh level
     # if no chosen mesh level was passed
