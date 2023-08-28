@@ -1,17 +1,14 @@
 # Results for linear system benchmarks on multiphysics problems solved by Elmer
 
-As with many computational methods FEM at it's core requires solving a large _sparse linear system_. This is the computationally expensive operation in FEM simulation and thus a good choice of _linear solver_ can have a significant impact on the total runtime. Hence, over the decades a multitude of different solvers have been developed to solve linear systems with different properties. But this large quantity of options can be a double-edged sword in that a good solver most likely exists for each problem type, but finding it can feel overwhelming.
-
-The purpose of this directory is to gather together the results from some simple benchmark cases for multiphysics problems solvable with Elmer. More information on the specific cases can be found within the associated directories. The purpose of this markdown is to provide some general information about linear solvers and when they could be applicable.
-
 # Table of contents
 1. [General](#general)
 2. [Benchmarking](#benchmarking)
-3. [Tables](#tables)
+3. [Problems](#problems)
+4. [Tables](#tables)
    1. [Solver properties](#solver_props)
    2. [Problem properties](#problem_props)
-4. [Linear systems](#linsys)
-5. [Linear solver families](#families)
+5. [Linear systems](#linsys)
+6. [Linear solver families](#families)
    1. [Direct methods](#direct)
    2. [Krylov subspace methods](#krylov)
    3. [Multigrid methods](#multigrid)
@@ -20,9 +17,9 @@ The purpose of this directory is to gather together the results from some simple
 
 ## General <a name="general"></a>
 
-This markdown has quite a lot of information so depending on the readers goals some sections could be skipped. Ideally, everyone who is choosing a linear solver should read Sections [1](#general)-[3](#tables). Of these the most crucial is the Section [3](#tables) as that outlines both with which matrix types a given linear solver would work and what types of characteristic matrices each outlined problem forms. This at least should guide the reader in the choice of what _not_ to choose as the linear solver, but isn't enough to find the go to solver.
+This markdown has quite a lot of information so depending on the readers goals some sections could be skipped. Ideally, everyone who is choosing a linear solver should read Sections [1](#general)-[4](#tables). Of these the most crucial is the Section [4](#tables) as that outlines both with which matrix types a given linear solver would work and what types of characteristic matrices each outlined problem forms. This at least should guide the reader in the choice of what _not_ to choose as the linear solver, but isn't enough to find the go to solver.
 
-Sections [4](#linsys)-[5](#families) provide extra information on the solvers and their properties and can be skipped if that is not of interest. These sections are by no means mathematically rigorous, but require a running understanding of numerical linear algebra.
+Sections [5](#linsys)-[6](#families) provide extra information on the solvers and their properties and can be skipped if that is not of interest. These sections are by no means mathematically rigorous, but require a running understanding of numerical linear algebra.
 
 ## Benchmarking <a name="benchmarking"></a>
 
@@ -36,10 +33,31 @@ Both the runtimes and $\beta$ are included as barplots in the problem specific d
 
 Note that for each problem there exists benchmarks for Elmer's internal CPU based solvers as well as Hypre's CPU based solvers. Additionally, some more case specific benhmarks are available under some of the problem directories. These are listed below.
 
-- Poisson-WinkelUnstructured: AmgX benchmarks
-- Poisson-WinkelUnstructured: BoomerAMG benchmarks
-- Navier-WinkelStructured: AmgX benchmarks
-- VectorHelmholtz-BandpassFilterTets: ILUT benchmarks
+- [Poisson-WinkelUnstructured](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Poisson-WinkelUnstructured): AmgX benchmarks
+- [Poisson-WinkelUnstructured](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Poisson-WinkelUnstructured): BoomerAMG benchmarks
+- [Navier-WinkelStructured](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/Navier-WinkelStructured): AmgX benchmarks
+- [VectorHelmholtz-BandpassFilterTets](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/VectorHelmholtz-BandpassFilterTets): ILUT benchmarks
+
+## Problems <a name="problems"></a>
+
+In the benchmarks a variety of different problem types were covered. The links to the case specific directories are found below.
+
+* Poisson
+  - [WinkelStructured](https://github.com/ElmerCSC/elmer-linsys/tree/main/results/Poisson-WinkelStructured)
+  - [WinkelUnstructured](https://github.com/ElmerCSC/elmer-linsys/tree/main/results/Poisson-WinkelUnstructured)
+* Navier (Linear Elasticity)
+  - [WinkelStructured](https://github.com/ElmerCSC/elmer-linsys/tree/main/results/Navier-WinkelStructured)
+* Stokes (Incompressible stokes)
+  - [Circular](https://github.com/ElmerCSC/elmer-linsys/tree/main/results/Stokes-Circular)
+* Electrostatics
+  - [CapacitanceOfTwoBalls (h-strategy)](https://github.com/ElmerCSC/elmer-linsys/tree/main/results/Electrostatics-CapacitanceOfTwoBallsH)
+  - [CapacitanceOfTwoBalls (p-strategy)](https://github.com/ElmerCSC/elmer-linsys/tree/main/results/Electrostatics-CapacitanceOfTwoBallsP)
+* Magnetostatics
+  - [FiveCoils](https://github.com/ElmerCSC/elmer-linsys/tree/main/results/Magnetostatics-FiveCoils)
+* VectorHelmholtz
+  - [Waveguide](https://github.com/ElmerCSC/elmer-linsys/tree/main/results/VectorHelmholtz-Waveguide)
+  - [BandpassFilter (Tetrahedral mesh)](https://github.com/ElmerCSC/elmer-linsys/tree/main/results/VectorHelmholtz-BandpassFilterTets)
+  - [BandpassFilter (Hexahedral mesh)](https://github.com/ElmerCSC/elmer-linsys/tree/main/results/VectorHelmholtz-BandpassFilterHexas)
 
 ## Tables <a name="tables"></a>
 
@@ -145,16 +163,18 @@ Idrs Parameter = 5  ! May be specified when using Idrs
 
 ### Multigrid methods <a name="multigrid"></a>
 
-Multigrid methods are a newer class of solvers that are especially designed for solving discretized differential equations. They accomplish this by recursively doing coarse grid corrections on a set of coarser meshes of the problem. That is at the base case (with the coarsest mesh) the associated system is solved with a direct method. This solution of the base case is then used to find an approximation for the solution of the one finer mesh via coarse mesh correction. The finer approximations are then recursively used to find approximations on ever finer meshes until the original problem is reached. This is not an exhaustive explanation of the method. For more information see e.g. the ElmerSolver manual section 4.4.
+Multigrid methods are a newer class of solvers that are especially designed for solving discretized differential equations. They accomplish this by recursively doing coarse grid corrections on a set of coarser meshes of the problem. That is at the base case (with the coarsest mesh) the associated system is solved with a direct method. This solution of the base case is then used to find an approximation for the solution of the one finer mesh via coarse mesh correction. The finer approximations are then recursively used to find approximations on ever finer meshes until the original problem is reached. This is not an exhaustive explanation of the method. For more information see e.g. the ElmerSolver manual section 4.4 (the ElmerSolver is not fully up to date when it comes to multigrid methods available, but is a good starting point for learning more).
 
-There are two main multigrid methods: the geometric multigrid (GMG) and algebraic multigrid (AMG), which differ in the way they find the coarse level equations. GMG uses a set of hierachical meshes to form the coarse level equations, while AMG can formulate them based on matrix $A$ alone. Thus AMG is generally the more used method.
+There are Elmer provides four different multigrid methods: the geometric multigrid (GMG), algebraic multigrid (AMG), cluster multigrid (CMG) and $p$-element multigrid (PMG), which differ in the way they find the coarse level equations. GMG uses a set of hierachical meshes to form the coarse level equations, while AMG can formulate them based on matrix $A$ alone via the classic Ruge-Stuben algorithm. CMG is an implementation of the agglomeration multigrid. PMG in turn is a novel approach for Elmer and finds the coarse level equations with regards to the $p$-elements rather than the standard mesh elements.
 
-The AMG method can theoretically be used with any (square) $A$, but it performs most reliably when $A$ is symmetric and semidefinite.
+It is good to note that the Elmer implementations for AMG and CMG are not parallelized. In this regard Hypres BoomerAMG implementation supplements the selection.
+
+The multigrid methods can theoretically be used with any (square) $A$, but it performs most reliably when $A$ is symmetric and semidefinite.
 
 Multigrid methods can be used in Elmer by stating:
 ```fortran
 Linear System Solver = "Multigrid"
-MG Method = "Geometric"  ! "Algebraic"
+MG Method = "Geometric"  ! "Algebraic", "Cluster", "p"
 ! The smoothing was not discussed, but is part of the iteration
 MG Smoother = CG  ! Jacobi, BiCGStab, ...
 MG Pre Smoothing iterations = 1  ! 2, 3, ...
