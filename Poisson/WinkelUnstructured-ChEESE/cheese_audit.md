@@ -72,7 +72,7 @@ spack install mpip
 # spack spec -I extrae@3.8.3~~cuda 
 spack install extrae@3.8.3~~cuda 
 
-spack --config-scope=$SPACK_USER_PREFIX install dlb@3.3.1
+spack --config-scope=$SPACK_USER_PREFIX install dlb@3.0.1
 ```
 
 Extrae needs a configuration file `extrae_detail_circular.xml` 
