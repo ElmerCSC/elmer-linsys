@@ -47,7 +47,7 @@ ml load elmer/gcc-spack
 
 ###### load tools   #########
 export SPACK_USER_PREFIX=/project/$SLURM_JOB_ACCOUNT/spack   # change this if necessary
-module load spack/23.03
+module load spack/23.03-2
 # module load papi
 module load extrae
 # export EXTRAE_CONFIG_FILE=extrae_detail.xml
