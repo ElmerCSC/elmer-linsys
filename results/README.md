@@ -29,7 +29,7 @@ t = \alpha n^{\beta}
 ```
 where the $t$ is the runtime, $n$ the dimension of the system, $\alpha$ the constant coefficient and $\beta$ the scaling coefficient. By looking at the runtimes for different sized systems we can get an idea for $\alpha$. However, it is the $\beta$ that has the greater impact when the problem is scaled onto thousands of cores. Hence, it is separately computed by fitting a curve of the form associated with the algorithmic scaling to results on different sized systems.
 
-Both the runtimes and $\beta$ are included as barplots in the problem specific directories. The total runtimes are plotted with the "plot_runtimes.py" script that can be found in "elmer-linsys/python-scripts" directory. Likewise, the scaling coefficients are can be plotted with the "plot_scalability_bar.py" script in the "elmer-linsys/python-scripts" directory. There are also some additional scripts for plotting different things. To learn about these please refer to the docstring found at the beginning of the script files.
+Both the runtimes and $\beta$ are included as barplots in the problem specific directories. The total runtimes are plotted with the [plot_times.py](https://github.com/ElmerCSC/elmer-linsys/blob/f984650f31e2252a5638a5ff54433fd1c2fc7742/python-scripts/plot_times.py) script that can be found in [python-scripts](https://github.com/ElmerCSC/elmer-linsys/tree/f984650f31e2252a5638a5ff54433fd1c2fc7742/python-scripts) directory. Likewise, the scaling coefficients are can be plotted with the [plot_scalability_bar.py](https://github.com/ElmerCSC/elmer-linsys/blob/f984650f31e2252a5638a5ff54433fd1c2fc7742/python-scripts/plot_scalability_bar.py) script in the [python-scripts](https://github.com/ElmerCSC/elmer-linsys/tree/f984650f31e2252a5638a5ff54433fd1c2fc7742/python-scripts) directory. There are also some additional scripts for plotting different things. To learn about these please refer to the docstring found at the beginning of the script files.
 
 Note that for each problem there exists benchmarks for Elmer's internal CPU based solvers as well as Hypre's CPU based solvers. Additionally, some more case specific benhmarks are available under some of the problem directories. These are listed below.
 
@@ -40,7 +40,7 @@ Note that for each problem there exists benchmarks for Elmer's internal CPU base
 
 ## Problems <a name="problems"></a>
 
-In the benchmarks a variety of different problem types were covered. The links to the case specific directories are found below.
+In the benchmarks a variety of different problem types were covered. The links to the case specific directories can be found below.
 
 * Poisson
   - [WinkelStructured](https://github.com/ElmerCSC/elmer-linsys/tree/main/results/Poisson-WinkelStructured)
@@ -165,7 +165,7 @@ Idrs Parameter = 5  ! May be specified when using Idrs
 
 Multigrid methods are a newer class of solvers that are especially designed for solving discretized differential equations. They accomplish this by recursively doing coarse grid corrections on a set of coarser meshes of the problem. That is at the base case (with the coarsest mesh) the associated system is solved with a direct method. This solution of the base case is then used to find an approximation for the solution of the one finer mesh via coarse mesh correction. The finer approximations are then recursively used to find approximations on ever finer meshes until the original problem is reached. This is not an exhaustive explanation of the method. For more information see e.g. the ElmerSolver manual section 4.4 (the ElmerSolver is not fully up to date when it comes to multigrid methods available, but is a good starting point for learning more).
 
-There are Elmer provides four different multigrid methods: the geometric multigrid (GMG), algebraic multigrid (AMG), cluster multigrid (CMG) and $p$-element multigrid (PMG), which differ in the way they find the coarse level equations. GMG uses a set of hierachical meshes to form the coarse level equations, while AMG can formulate them based on matrix $A$ alone via the classic Ruge-Stuben algorithm. CMG is an implementation of the agglomeration multigrid. PMG in turn is a novel approach for Elmer and finds the coarse level equations with regards to the $p$-elements rather than the standard mesh elements.
+Elmer provides four different multigrid methods: the geometric multigrid (GMG), algebraic multigrid (AMG), cluster multigrid (CMG) and $p$-element multigrid (PMG), which differ in the way they find the coarse level equations. GMG uses a set of hierachical meshes to form the coarse level equations, while AMG can formulate them based on matrix $A$ alone via the classic Ruge-Stuben algorithm. CMG is an implementation of the agglomeration multigrid. PMG in turn is a novel approach for Elmer and finds the coarse level equations with regards to the $p$-elements rather than the standard mesh elements.
 
 It is good to note that the Elmer implementations for AMG and CMG are not parallelized. In this regard Hypres BoomerAMG implementation supplements the selection.
 
