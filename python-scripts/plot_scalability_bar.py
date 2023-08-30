@@ -1,8 +1,15 @@
 """
 Basic Python script that finds and plots the "scaling coefficients" for all solvers in a given file 
-The file should contain data for multiple mesh levels
+There are two ways for running this script. Either the required information can be provided
+from the command line (see this docstring) or the information can be predefined (see PREDEFINED)
+The values passed on the command line will override the predefined ones. 
 
-This script has three optional passable cmd args
+To plot the valid values all of the files (*.dat, *.dat.marker, *.dat.names) written by the 
+SaveScalars function in Elmer needs to be available in the same directory. Additionally,
+user must specify the columns of interest in the *.dat.names file by providing unambigous substrings
+defining them in the PREDEFINED section.
+
+The optional passable cmd args
    1. -f (--file) for using a different file than the one predefined
    2. -p (--path) for using a different path than the one predefined
    3. -i (--ignore) for ignoring solvers with highest mesh level lower than the one passed as argument

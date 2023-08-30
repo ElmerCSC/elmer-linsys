@@ -1,14 +1,21 @@
 """
 Basic Python script that plots the execution times of all solvers with a given mesh level
-If the file contains data for multiple mesh levels plots only the most common one
+There are two ways for running this script. Either the required information can be provided
+from the command line (see this docstring) or the information can be predefined (see PREDEFINED)
+The values passed on the command line will override the predefined ones. 
 
-This script has four optional passable cmd args
+To plot the valid values all of the files (*.dat, *.dat.marker, *.dat.names) written by the 
+SaveScalars function in Elmer needs to be available in the same directory. Additionally,
+user must specify the columns of interest in the *.dat.names file by providing unambigous substrings
+defining them in the PREDEFINED section.
+
+The optional passable cmd args
    1. -f (--file) for using a different file than the one predefined
    2. -p (--path) for using a different path than the one predefined
    3. -v (--viz_total_time) for plotting the total time as well (the flag is enough)
    4. -m (--mesh_level) for choosing the wanted mesh level if selected file contains multiple
-   4. -s (--save_as) for defining the filename as which the figure will be saved. If not passed the figure will be visualized
-   5. -t (--tolerance) for defining the tolerance used in float mode and numpy.isclose
+   5. -s (--save_as) for defining the filename as which the figure will be saved. If not passed the figure will be visualized
+   6. -t (--tolerance) for defining the tolerance used in float mode and numpy.isclose
 
 Note it is not recommended to plot total times as well if file contains results for a large number of solvers
 as the figure will get very crowded
@@ -34,7 +41,7 @@ mesh_level_col = "expression 1"  # The used mesh level
 dof_col = "dofs"  # The number of degrees of freedom
 
 # Predefine this if P-multigrid was used. Ignore otherwise
-p_level_col = "expression 2"
+p_level_col = "_______"
 
 # Predefined .dat files that the code will look for if nothing is passed as argument
 dat_filename = "f.dat"
