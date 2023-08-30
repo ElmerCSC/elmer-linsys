@@ -16,7 +16,7 @@ With wave equations the tolerance based incomplete LU factorization (ILUT) can p
 ![Runtimes ML2](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/VectorHelmholtz-BandpassFilterTets/runtimes_ILUT_ML2.png?raw=true)
 ![Runtimes ML3](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/VectorHelmholtz-BandpassFilterTets/runtimes_ILUT_ML3.png?raw=true)
 
-From the results we see that the differences in runtimes that the changes in tolerances cause is quite small. Interestingly, across multiple solvers the different tolerances can have quite a different effect even though the underlying coefficient matrix is the same. This means that the increase (or decrease) in tolerance doens't have a systematic impact on the runtimes as one might assume.
+From the results we see that the differences in runtimes that the changes in tolerances cause are quite small. Interestingly, across multiple solvers the different tolerances can have quite a different effect even though the underlying coefficient matrix is the same. With BiCGStab(l) it seems that performance is consistently improved by having a very big tolerance (1e-1 or 1e-2), while similar effect is not visible with Idr(s). This means that the increase (or decrease) in tolerance doens't really have a systematic impact on the runtimes as one might assume.
 
 It is also good to note that the ILUT preconditioner doens't seem to make the solvers any more stable as with the finest mesh all Idr(s) and some BiCGStab(l) solvers fail to converge. This is an effect that was seen in the main benchmarks as well (see runtimes_ML3.png for example).
 
