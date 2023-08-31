@@ -8,9 +8,9 @@ This repository provides tools and test cases for comparing of different linear 
 
 We are open for ideas what problems should be studied. The test cases should be scalable and simple in the sense that only one equation is analyzed at a time.  Scalable test require that the mesh can be easily obtained in different densities. This may mean internal mesh multiplication by using "Mesh Levels" or easily refined meshes with some open source tools.
 
-The text contents of this repository are licensed under the Creative Commons Attribution-NonCommercial 4.0 International License.
+The text contents of this repository are licensed under the Creative Commons Attribution-NonCommercial 4.0 International License. To view a copy of this license, visit <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a> 
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a>
 
 ## Links
 
