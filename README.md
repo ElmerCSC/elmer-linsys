@@ -18,6 +18,8 @@ This repository provides tools and test cases for comparing of different linear 
 
 For those too impatient to do a more rigorous study to find the optimal linear solver below is attached a flowchart that could guide to a very good option. If the properties of the coefficient matrix formed for the problem are not known beforehand one can start testing from the most strict requirements (top right) and proceed towards the least strict requirements (bottom left) until convergence is achieved. Alternatively, the handy table at [README.md](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/README.md) file in [results](https://github.com/ElmerCSC/elmer-linsys/tree/main/results) directory can be used to learn about the matrix properties associated with each problem type.
 
+![Decision flowchart](https://github.com/ElmerCSC/elmer-linsys/blob/main/pics/decision_flowchart.png?raw=true)
+
 ## License
 
 The contents of this repository are licensed under the Creative Commons Attribution-NonCommercial 4.0 International License. To view a copy of this license, visit <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a> 
@@ -25,4 +27,3 @@ The contents of this repository are licensed under the Creative Commons Attribut
 <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a>
 
 
-![Decision flowchart](https://github.com/ElmerCSC/elmer-linsys/blob/main/pics/decision_flowchart.png?raw=true)
