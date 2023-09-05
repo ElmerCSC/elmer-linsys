@@ -8,9 +8,9 @@ This repository provides tools and test cases for comparing of different linear 
 
 ## Content of the repository
 
-**Results summary**: Many test cases are included in this repository. For the results of the benchmarks and some analysis on these cases reader is referred to [README.md](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/README.md) file in the [results](https://github.com/ElmerCSC/elmer-linsys/tree/main/results) directory.
+**General discussion**: Many test cases are included in this repository. For the results of the benchmarks and some analysis on these cases reader is referred to [README.md](https://github.com/ElmerCSC/elmer-linsys/blob/main/results/README.md) file in the [results](https://github.com/ElmerCSC/elmer-linsys/tree/main/results) directory.
 
-**Result details**: Each case specific directory in the [results](https://github.com/ElmerCSC/elmer-linsys/tree/main/results) has it's own README with some conclusions. However, these conclusions are by no means absolute or generalizable. So in the [FAQ.md](https://github.com/ElmerCSC/elmer-linsys/blob/main/FAQ.md) file can be found some answers for frequently asked questions that may provide some guidance when choosing a linear solver.
+**Benchmark results**: Each case specific directory in the [results](https://github.com/ElmerCSC/elmer-linsys/tree/main/results) has it's own README with some conclusions. However, these conclusions are by no means absolute or generalizable. So in the [FAQ.md](https://github.com/ElmerCSC/elmer-linsys/blob/main/FAQ.md) file can be found some answers for frequently asked questions that may provide some guidance when choosing a linear solver.
 
 **Benchmarking scripts**: This repository provides lots of tools for benchmarking and is structured to allow easy automation. To learn more about this reader is directed to the [HOW_TO_USE.md](https://github.com/ElmerCSC/elmer-linsys/blob/main/HOW_TO_USE.md) file.
 
