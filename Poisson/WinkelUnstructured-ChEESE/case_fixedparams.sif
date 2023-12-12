@@ -1,0 +1,139 @@
+! This is just slightly modified version to deal with the tetrahedral mesh.
+! The BCs are just different compared to strutural case i.e. (3,7) -> (4,8).
+
+
+Header
+  CHECK KEYWORDS Warn
+  Mesh DB "." "winkel"
+  Include Path ""
+  Results Directory "results"
+End
+
+
+Simulation
+  Max Output Level = 3
+
+  Coordinate System = "Cartesian"
+  Simulation Type = "Steady State"
+  Steady State Max Iterations = 1
+  Output Intervals = 1
+
+  Mesh Levels = 3
+
+  Output Level = 10
+
+  Simulation Timing = Logical True
+  Post File = "case_fixedparams.vtu"
+End
+
+
+Constants
+  Stefan Boltzmann = 5.67e-08
+End
+
+
+Body 1
+  Name = "Body"
+  Body Force = 1
+  Equation = 1
+  Material = 1
+End
+
+
+Equation 1
+  Name = "Equations"
+  Active Solvers(1) = 1
+End
+
+
+! Rest of the solver definitions exlucing the linear solver
+Solver 1
+  Exec Solver = "Always"
+  Equation = "HeatEquation"
+
+  Variable = -dofs 1 "Temperature"
+
+  !Procedure = "/scratch/elmer/jahokk/build_Elmer_devel/fem/tests/ModelPDEevol/ModelPDEevol.so" "AdvDiffSolver"
+Procedure = "./ModelPDEevol_fixedparams.so" "AdvDiffSolver"
+
+  Nonlinear System Max Iterations = 1
+  Nonlinear System Consistent Norm = True
+  Steady State Convergence Tolerance = 1.0e-05
+
+!  Linear System Save = True
+
+! Add some timing info
+  Linear System Timing = True
+  Solver Timing = True
+
+
+!!!!!!!!!  Include the wanted solver here  !!!!!!!!!
+
+  include elmer_IDRS5_ILU0.sif
+!  include elmer_CG_ILU0.sif
+  
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+End
+
+
+Solver 2
+!  Exec Solver = after simulation
+
+  Equation = SaveTimings
+  Procedure = "SaveData" "SaveScalars"
+
+  Filename = "f.dat"
+  Variable 1 = Temperature
+  Operator 1 = dofs
+  Operator 2 = elements
+  Operator 3 = partitions
+  Operator 4 = norm
+  Operator 5 = cpu time
+
+! Give a unique tag to each line/method
+  Line Marker = Integer $LinMethod$
+
+! We write a separate file showing how marker is mapped to string of the method
+  Comment = String $LinStr$
+
+! add the number of partitions to the filename
+!  Partition Numbering = Logical True
+
+  File Append = True
+  Parallel Reduce = True
+End
+
+
+Material 1
+  Name = "Ideal"
+  Diffusion Coefficient = Real 1.0
+  Density = 1.0
+End
+
+
+Body Force 1
+  Name = "Heating"
+  Field Source = Real 1.0
+End
+
+
+Boundary Condition 1
+  Name = "BC1"
+  Target Boundaries(1) = 4
+  Temperature = 0.0
+End
+
+
+Boundary Condition 2
+  Name = "BC2"
+  Target Boundaries(1) = 8 
+  Temperature = 0.0
+End
+
+
+Solver 1 :: Reference Norm = 1.42066313E+00
+Solver 1 :: Reference Norm Tolerance = 0.02
+
+
+!End Of File
