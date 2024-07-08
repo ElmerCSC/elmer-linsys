@@ -51,6 +51,10 @@ Solver 1
   Nonlinear System Consistent Norm = True
   Steady State Convergence Tolerance = 1.0e-05
 
+! Add timings for bulk and boundary assembly separately. 
+  Bulk Assembly Timing = Logical True
+  Boundary Assembly Timing = Logical True
+
 ! Add some timing info
   Linear System Timing = True
   Solver Timing = True

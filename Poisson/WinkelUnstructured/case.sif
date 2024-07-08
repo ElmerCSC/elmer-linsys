@@ -55,6 +55,10 @@ Solver 1
   Linear System Timing = True
   Solver Timing = True
 
+! Add timings for bulk and boundary assembly separately. 
+  Bulk Assembly Timing = Logical True
+  Boundary Assembly Timing = Logical True
+
 ! Have the linear system definitions here since only they change
 ! You can always move them to the solver section below
   include linsys.sif 
