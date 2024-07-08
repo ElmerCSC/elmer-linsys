@@ -58,6 +58,16 @@ Solver 1
 ! Have the linear system definitions here since only they change
 ! You can always move them to the solver section below
   include linsys.sif 
+
+
+! What is the effect of these flags for multithreaded performance?
+! Multicolour assembly should eliminate the race conditions. 
+  Multicolour Solver = Logical True
+  Multicolour Consistent = Logical True
+
+! This uses vectorized assembly. It is default if there are more than
+! 1 thread. However, if only one the nonvectorized is the default.
+  Vector Assembly = Logical True
 End
 
 
@@ -72,8 +82,9 @@ Solver 2
   Operator 1 = dofs
   Operator 2 = elements
   Operator 3 = partitions
-  Operator 4 = norm
-  Operator 5 = cpu time
+  Operator 4 = threads
+  Operator 5 = norm
+  Operator 6 = cpu time
 
   Expression 1 = Real $ipar(0)
 
