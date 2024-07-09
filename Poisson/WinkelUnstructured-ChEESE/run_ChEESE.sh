@@ -51,5 +51,4 @@ ml use /appl/local/csc/modulefiles
 ###### (using cray-libsci (BLAS, LAPACK)
 module load elmer/gcc-cray
 ###### make it so! #########
-ipar=2
-srun ElmerSolver case_fixedparams.sif
+srun ElmerSolver case_fixedparams.sif -ipar 1 2

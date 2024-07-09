@@ -18,7 +18,7 @@ Simulation
 
   Mesh Levels = $ipar(0)
 
-  Output Level = 10
+  Output Level = $ipar(1)
 
   Simulation Timing = Logical True
 !  Post File = "case.vtu"
