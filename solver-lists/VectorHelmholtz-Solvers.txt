@@ -1,0 +1,12 @@
+linsys/elmer_iter_BiCGStab4_ILU0.sif
+linsys/elmer_iter_BiCGStab4_ILU1.sif
+linsys/elmer_iter_BiCGStab4_none.sif
+linsys/elmer_iter_BiCGStab2_ILU0.sif
+linsys/elmer_iter_BiCGStab2_ILU1.sif
+linsys/elmer_iter_BiCGStab2_none.sif
+linsys/elmer_iter_BiCGStab_ILU0.sif
+linsys/elmer_iter_BiCGStab_ILU1.sif
+linsys/elmer_iter_BiCGStab_none.sif
+linsys/elmer_iter_Idrs5_ILU0.sif
+linsys/elmer_iter_Idrs5_ILU1.sif
+linsys/elmer_iter_Idrs5_none.sif

@@ -1,0 +1,68 @@
+  $LinMethod = 61004000
+  $LinStr = "BPC: Gmres + ILU0"
+
+  Linear System Solver = "Block"
+  Block Gauss-Seidel = Logical True
+  Block Matrix Reuse = Logical False
+  Block Scaling = Logical False
+  Block Preconditioner = Logical True
+  
+  ! tolerance of block solutions (if you choose iterative)
+  $block_tol = 0.0001
+  
+  ! max amount of block iterations (if you choose iterative)
+  $block_max_iter = 10000
+  
+  ! pre-conditioner of block matrices   
+  $block_precond = "ILU0"
+
+  ! iterative method for block matrices
+  $block_iter_met = "Gmres"
+
+ 
+! Default is [1 2 3 4]
+! Block Structure(4) = Integer 1 1 1 2
+!  Block Order(4) = Integer 1 2 3 4
+
+! Linear System Scaling = False
+! Linear system solver for outer loop
+!-----------------------------------------
+  Outer: Linear System Solver = "Iterative"
+  Outer: Linear System Iterative Method = GCR
+  Outer: Linear System GCR Restart =  250
+  Outer: Linear System Residual Output = 10 ! please, leave that one to keep output readable
+  Outer: Linear System Max Iterations =  10
+  Outer: Linear System Abort Not Converged = False
+  Outer: Linear System Convergence Tolerance = 1e-07
+
+  block 11: Linear System Convergence Tolerance = $block_tol
+  block 11: Linear System Solver = "iterative"
+  block 11: Linear System Scaling = false
+  block 11: Linear System Preconditioning = $block_precond
+  block 11: Linear System Residual Output = 0 ! please, leave that one to keep output readable
+  block 11: Linear System Max Iterations = $block_max_iter
+  block 11: Linear System Iterative Method = $block_iter_met
+
+  block 22: Linear System Convergence Tolerance = $block_tol
+  block 22: Linear System Solver = "iterative"
+  block 22: Linear System Scaling = false
+  block 22: Linear System Preconditioning = $block_precond
+  block 22: Linear System Residual Output = 0 ! please, leave that one to keep output readable
+  block 22: Linear System Max Iterations = $block_max_iter
+  block 22: Linear System Iterative Method = $block_iter_met
+
+  block 33: Linear System Convergence Tolerance = $block_tol
+  block 33: Linear System Solver = "iterative"
+  block 33: Linear System Scaling = false
+  block 33: Linear System Preconditioning = $block_precond
+  block 33: Linear System Residual Output = 0 ! please, leave that one to keep output readable
+  block 33: Linear System Max Iterations = $block_max_iter
+  block 33: Linear System Iterative Method = $block_iter_met
+
+  block 44: Linear System Convergence Tolerance = $block_tol
+  block 44: Linear System Solver = "iterative"
+  block 44: Linear System Scaling = true
+  block 44: Linear System Preconditioning = $block_precond
+  block 44: Linear System Residual Output = 0 ! please, leave that one to keep output readable
+  block 44: Linear System Max Iterations = $block_max_iter
+  block 44: Linear System Iterative Method = $block_iter_met

@@ -1,0 +1,33 @@
+  Linear System Preconditioning Damp Coefficient = 0.0
+  Linear System Preconditioning Damp Coefficient im = -0.2
+  Mass-proportional Damping = True
+
+  Linear System Abort Not Converged = True
+  Linear System Complex = true
+  Linear System Block Mode = Logical True
+  Block Nested System = Logical True
+  Block Preconditioner = Logical True
+  Block Scaling = Logical True
+
+! Linear system solver for outer loop
+!-----------------------------------------
+  Outer: Linear System Solver = "Iterative"
+  Outer: Linear System Convergence Tolerance = 1e-7
+  Outer: Linear System Iterative Method = GCR
+  Outer: Linear System GCR Restart =  50
+  Outer: Linear System Residual Output =  1
+  Outer: Linear System Max Iterations =  30
+  Outer: Linear System Pseudo Complex = Logical True
+
+  $blocktol = 1.0e-2
+
+  block 11: Linear System Solver = "iterative"
+  block 11: Linear System Preconditioning = ILU0
+  block 11: Linear System Residual Output = 10
+  block 11: Linear System Max Iterations = 100
+  block 11: Linear System Iterative Method = GCR !bicgstabl
+  block 11: Linear System Convergence Tolerance = $blocktol
+  block 11: Linear System GCR Restart = 20
+!  block 11: BicgStabl Polynomial Degree = 4
+  block 11: Linear System Complex = True
+  block 11: Linear System Abort Not Converged = True

@@ -1,0 +1,108 @@
+ $LinMethod = 60607000
+  $LinStr = "BPC: BiCGStab + BoomerAMG"
+
+  Linear System Solver = "Block"
+  Block Gauss-Seidel = Logical True
+  Block Matrix Reuse = Logical False
+  Block Scaling = Logical False
+  Block Preconditioner = Logical True
+  
+  ! tolerance of block solutions (if you choose iterative)
+  $block_tol = 0.0001
+  
+  ! max amount of block iterations (if you choose iterative)
+  $block_max_iter = 10000
+  
+  ! pre-conditioner of block matrices   
+  $block_precond = "boomeramg"
+
+  ! iterative method for block matrices
+  $block_iter_met = "BiCGStab"
+
+ 
+! Default is [1 2 3 4]
+! Block Structure(4) = Integer 1 1 1 2
+!  Block Order(4) = Integer 1 2 3 4
+
+! Linear System Scaling = False
+! Linear system solver for outer loop
+!-----------------------------------------
+  Outer: Linear System Solver = "Iterative"
+  Outer: Linear System Iterative Method = GCR
+  Outer: Linear System GCR Restart =  250
+  Outer: Linear System Residual Output = 10 ! please, leave that one to keep output readable
+  Outer: Linear System Max Iterations =  10
+  Outer: Linear System Abort Not Converged = False
+  Outer: Linear System Convergence Tolerance = 1e-07
+
+  block 11: Linear System Use Hypre = Logical True
+  block 11: Linear System Convergence Tolerance = $block_tol
+  block 11: Linear System Solver = "iterative"
+  block 11: Linear System Scaling = false
+  block 11: Linear System Preconditioning = $block_precond
+  block 11: Linear System Residual Output = 0 ! please, leave that one to keep output readable
+  block 11: Linear System Max Iterations = $block_max_iter
+  block 11: Linear System Iterative Method = $block_iter_met
+  block 11: BoomerAMG Relax Type = Integer 3
+  block 11: BoomerAMG Coarsen Type = Integer 0
+  block 11: BoomerAMG Num Sweeps = Integer 1
+  block 11: Boomeramg Max Levels = Integer 25
+  block 11: BoomerAMG Interpolation Type = Integer 0
+  block 11: BoomerAMG Smooth Type = Integer 3
+  block 11: BoomerAMG Cycle Type = Integer 1
+  block 11: BoomerAMG Num Functions = Integer 1 ! DOFs
+  block 11: BoomerAMG Strong Threshold = Real 0.5
+
+  block 22: Linear System Use Hypre = Logical True
+  block 22: Linear System Convergence Tolerance = $block_tol
+  block 22: Linear System Solver = "iterative"
+  block 22: Linear System Scaling = false
+  block 22: Linear System Preconditioning = $block_precond
+  block 22: Linear System Residual Output = 0 ! please, leave that one to keep output readable
+  block 22: Linear System Max Iterations = $block_max_iter
+  block 22: Linear System Iterative Method = $block_iter_met
+  block 22: BoomerAMG Relax Type = Integer 3
+  block 22: BoomerAMG Coarsen Type = Integer 0
+  block 22: BoomerAMG Num Sweeps = Integer 1
+  block 22: Boomeramg Max Levels = Integer 25
+  block 22: BoomerAMG Interpolation Type = Integer 0
+  block 22: BoomerAMG Smooth Type = Integer 3
+  block 22: BoomerAMG Cycle Type = Integer 1
+  block 22: BoomerAMG Num Functions = Integer 1 ! DOFs
+  block 22: BoomerAMG Strong Threshold = Real 0.5
+
+  block 33: Linear System Use Hypre = Logical True
+  block 33: Linear System Convergence Tolerance = $block_tol
+  block 33: Linear System Solver = "iterative"
+  block 33: Linear System Scaling = false
+  block 33: Linear System Preconditioning = $block_precond
+  block 33: Linear System Residual Output = 0 ! please, leave that one to keep output readable
+  block 33: Linear System Max Iterations = $block_max_iter
+  block 33: Linear System Iterative Method = $block_iter_met
+  block 33: BoomerAMG Relax Type = Integer 3
+  block 33: BoomerAMG Coarsen Type = Integer 0
+  block 33: BoomerAMG Num Sweeps = Integer 1
+  block 33: Boomeramg Max Levels = Integer 25
+  block 33: BoomerAMG Interpolation Type = Integer 0
+  block 33: BoomerAMG Smooth Type = Integer 3
+  block 33: BoomerAMG Cycle Type = Integer 1
+  block 33: BoomerAMG Num Functions = Integer 1 ! DOFs
+  block 33: BoomerAMG Strong Threshold = Real 0.5
+
+  block 44: Linear System Use Hypre = Logical True
+  block 44: Linear System Convergence Tolerance = $block_tol
+  block 44: Linear System Solver = "iterative"
+  block 44: Linear System Scaling = true
+  block 44: Linear System Preconditioning = $block_precond
+  block 44: Linear System Residual Output = 0 ! please, leave that one to keep output readable
+  block 44: Linear System Max Iterations = $block_max_iter
+  block 44: Linear System Iterative Method = $block_iter_met
+  block 44: BoomerAMG Relax Type = Integer 3
+  block 44: BoomerAMG Coarsen Type = Integer 0
+  block 44: BoomerAMG Num Sweeps = Integer 1
+  block 44: Boomeramg Max Levels = Integer 25
+  block 44: BoomerAMG Interpolation Type = Integer 0
+  block 44: BoomerAMG Smooth Type = Integer 3
+  block 44: BoomerAMG Cycle Type = Integer 1
+  block 44: BoomerAMG Num Functions = Integer 1 ! DOFs
+  block 44: BoomerAMG Strong Threshold = Real 0.5

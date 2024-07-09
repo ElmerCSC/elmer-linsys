@@ -1,0 +1,20 @@
+{
+    "config_version": 2, 
+    "solver": {
+        "preconditioner": {
+            "scope": "precond", 
+            "solver": "NOSOLVER"
+        }, 
+        "use_scalar_norm": 1, 
+        "solver": "GMRES", 
+        "print_solve_stats": 1, 
+        "obtain_timings": 1, 
+        "monitor_residual": 1,
+	"gmres_n_restart": 200,
+	"subspace_dim_s": 3,
+        "convergence": "ABSOLUTE", 
+        "scope": "main", 
+        "tolerance": 1e-8, 
+        "norm": "L2"
+    }
+}

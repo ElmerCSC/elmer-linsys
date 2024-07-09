@@ -24,6 +24,8 @@ Developers:
     elmer = 2  // Covers both elmer and elmer_iter
     hypre = 3
     trilinos = 4
+    amgx = 5
+    bpc = 6  // Not a developer, but used as grouping
 ----------------------------------------------------------
 
 ----------------------------------------------------------
@@ -34,30 +36,31 @@ Solvers/iterative methods:
     feti = 03 
     GCR = 04
     GMG_sgs = 05
-    BiCGStab = 06
+    BiCGStab = 06  // PBiCGStab
     CG = 07
     BoomerAMG = 08
-    FlexGmres = 09
+    FlexGmres = 09  // FGMRES
     GMRes = 10  // Also for Gmres
     LGMRes = 11
     ml_sgs = 12
     ml_sgs_dof3 = 13
     Idrs = 14
     Tfqmr = 15
+    Block_Jacobi = 16
     
 ----------------------------------------------------------
 
 ----------------------------------------------------------
 Preconditioning:
 
-    no preconditioner = 0  // includes instances _none and direct solvers
+    no preconditioner = 0  // Includes instances _none and direct solvers
     GMG = 1
     GMG_jacobi = 2
     GMG_wjacobi = 3
     ILU = 4
-    BILU = 5
+    BILU = 5  // Covers also DILU
     vanka = 6
-    BoomerAMG = 7
+    BoomerAMG = 7  // AMG
     Parasails = 8
     CMG_SGS = 9
 ----------------------------------------------------------

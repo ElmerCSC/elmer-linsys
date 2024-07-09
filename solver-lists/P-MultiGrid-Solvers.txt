@@ -1,0 +1,6 @@
+linsys/elmer_P_BiCGStab2_CG_ILU0.sif
+linsys/elmer_P_BiCGStab2_CG_none.sif
+linsys/elmer_P_BiCGStab4_CG_ILU0.sif
+linsys/elmer_P_BiCGStab4_CG_none.sif
+linsys/elmer_P_Idrs5_CG_ILU0.sif
+linsys/elmer_P_Idrs5_CG_none.sif

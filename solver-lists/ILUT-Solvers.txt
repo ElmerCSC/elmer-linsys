@@ -1,0 +1,15 @@
+linsys/elmer_iter_BiCGStab2_ILUT_3.sif
+linsys/elmer_iter_BiCGStab2_ILUT_4.sif
+linsys/elmer_iter_BiCGStab2_ILUT_5.sif
+linsys/elmer_iter_BiCGStab2_ILUT_6.sif
+linsys/elmer_iter_BiCGStab2_ILUT_7.sif
+linsys/elmer_iter_CG_ILUT_3.sif
+linsys/elmer_iter_CG_ILUT_4.sif
+linsys/elmer_iter_CG_ILUT_5.sif
+linsys/elmer_iter_CG_ILUT_6.sif
+linsys/elmer_iter_CG_ILUT_7.sif
+linsys/elmer_iter_Idrs5_ILUT_3.sif
+linsys/elmer_iter_Idrs5_ILUT_4.sif
+linsys/elmer_iter_Idrs5_ILUT_5.sif
+linsys/elmer_iter_Idrs5_ILUT_6.sif
+linsys/elmer_iter_Idrs5_ILUT_7.sif

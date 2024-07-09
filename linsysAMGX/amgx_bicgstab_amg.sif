@@ -1,0 +1,7 @@
+$LinMethod = 50607000
+$LinStr = "AMGX-BICGSTAB_AMG"
+
+  ! Linear System Symmetric =  True
+  ! AMGX solver
+  Linear System Solver = AMGX
+  AMGX config = String "config.json"

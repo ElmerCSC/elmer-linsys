@@ -1,4 +1,4 @@
-$LinMethod = 310041000
+$LinMethod = 31004100
 $LinStr = "Hypre: GMRes + ILU1"
 
 Linear System Use Hypre = Logical True

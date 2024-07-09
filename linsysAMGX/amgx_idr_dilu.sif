@@ -1,0 +1,7 @@
+$LinMethod = 51405000
+$LinStr = "AMGX-IDR_DILU"
+
+  ! Linear System Symmetric =  True
+  ! AMGX solver
+  Linear System Solver = AMGX
+  AMGX config = String "config.json"

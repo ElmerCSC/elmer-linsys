@@ -1,0 +1,29 @@
+  $LinMethod = -1  ! TODO: Proper markers
+  $LinStr = "BiCGStab{4} + MGP{CG + ILU0}"
+
+  Linear System Solver = Iterative
+  Linear System Iterative Method = BiCGStabl
+  Bicgstabl Polynomial Degree = 4
+  Linear System Max Iterations = 10000
+  Linear System Convergence Tolerance = 1.0e-8
+  Linear System Abort Not Converged = False
+  Linear System Residual Output = 10
+
+! You can edit here to compare to something more simple
+  Linear System Preconditioning = multigrid
+  Linear System Refactorize = False
+
+! Mg parameters only active when $pn>2 and prec set to "multigrid"
+  MG Method = p
+  MG Levels = $ipar(2)
+  MG Smoother = SGS ! cg
+  MG Pre Smoothing iterations = 2
+  MG Post Smoothing Iterations = 2
+  MG Lowest Linear Solver = iterative
+
+  mglowest: Linear System Scaling = False
+  mglowest: Linear System Iterative Method = CG !BiCGStabl
+  mglowest: Linear System Preconditioning = ILU0
+  mglowest: Linear System ILUT Tolerance = 1.0e-3
+  mglowest: Linear System Max Iterations = 1000
+  mglowest: Linear System Convergence Tolerance = 1.0e-3

@@ -1,0 +1,9 @@
+linsys/BPC_BiCGStab2_ILU0.sif
+linsys/BPC_BiCGStab2_none.sif
+linsys/BPC_BiCGStab4_ILU0.sif
+linsys/BPC_BiCGStab4_none.sif
+linsys/BPC_CG_ILU0.sif
+linsys/BPC_CG_none.sif
+linsys/BPC_Gmres_ILU0.sif
+linsys/BPC_idrs5_ILU0.sif
+linsys/BPC_idrs5_vanka.sif

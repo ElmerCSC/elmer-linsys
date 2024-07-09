@@ -1,0 +1,11 @@
+  Linear System Solver = Iterative
+  Linear System Iterative Method = BiCGStabl ! gcr ! idrs
+  Linear System Max Iterations = 1000
+  Linear System Convergence Tolerance = 1.0e-7
+  BiCGstabl polynomial degree = 8 ! 4...8
+  Linear System Preconditioning = none !ILU2 !vanka
+  Linear System ILUT Tolerance = 1.0e-3
+  Linear System Abort Not Converged = False
+  Linear System Residual Output = 1
+  Linear System Precondition Recompute = 1
+  Idrs Parameter = 6

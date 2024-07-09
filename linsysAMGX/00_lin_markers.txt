@@ -1,0 +1,86 @@
+Cheat sheet for the unique identifiers for the linear systems.
+
+Identifier consists of four main parts:
+   1. developer  (one digit)
+   2. solver/iterative method  (two digits)
+   3. preconditioner  (one digit)
+   4. preconditioners solver (if such is needed)  (one digits)
+
+Additionally, there are three additional values mixed in that dictate the parameter
+value passed to either the solver or preconditioner (one digit each). So let a be the
+developer id, b the solver id, c the preconditioner id, d the preconditioner solver id,
+and n, m, k the passed parameters (0 signifies both no parameter passed (if such is not
+needed) and 0 passed). Then the combined id would be "abncmdk" (so the numbers written
+one after another not multiplied).
+
+Limitations to how many digits are used to identify each part come from the fact that
+(32 bit) integers can have at most 10 digits and to avoid overflow it would be safer to
+limit total number of digits to 9.
+
+----------------------------------------------------------
+Developers:
+
+    direct = 1  // Not a developer, but used as grouping
+    elmer = 2  // Covers both elmer and elmer_iter
+    hypre = 3
+    trilinos = 4
+    amgx = 5
+----------------------------------------------------------
+
+----------------------------------------------------------
+Solvers/iterative methods:
+
+    mumps = 01
+    umfpack =  02
+    feti = 03 
+    GCR = 04
+    GMG_sgs = 05
+    BiCGStab = 06  // PBiCGStab
+    CG = 07
+    BoomerAMG = 08
+    FlexGmres = 09  // FGMRES
+    GMRes = 10  // Also for Gmres
+    LGMRes = 11
+    ml_sgs = 12
+    ml_sgs_dof3 = 13
+    Idrs = 14
+    Tfqmr = 15
+    Block_Jacobi = 16
+    
+----------------------------------------------------------
+
+----------------------------------------------------------
+Preconditioning:
+
+    no preconditioner = 0  // Includes instances _none and direct solvers
+    GMG = 1
+    GMG_jacobi = 2
+    GMG_wjacobi = 3
+    ILU = 4
+    BILU = 5  // Covers also DILU
+    vanka = 6
+    BoomerAMG = 7  // AMG
+    Parasails = 8
+    CMG_SGS = 9
+----------------------------------------------------------
+
+----------------------------------------------------------
+Preconditioner solver/iterative method:
+
+    no solver = 0  // includes instances with direct preconditioner, _none etc.
+    mumps = 1
+    mumps_10 = 2  // We can't have double precision parameters since otherwise we run out of digits
+    BiCGStab = 3
+    CG = 4
+    smoother = 5
+    wo_scaling = 6
+    BP = 7  // This goes against convention but would be hard to categorize otherwise
+----------------------------------------------------------
+ 
+
+Thus for example elmer_iter_BiCGStab2_BILU0 would become: 20625000  (2_06_2_5_0_0_0)
+direct_umfpack would be: 10200000  (1_02_0_0_0_0_0)
+and elmer_CGR_GMG_jacobi_BiCGStab_none would be: 20402030  (2_04_0_2_0_3_0)
+etc.
+    
+
