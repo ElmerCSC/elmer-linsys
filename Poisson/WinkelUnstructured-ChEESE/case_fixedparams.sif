@@ -1,14 +1,12 @@
 ! This is just slightly modified version to deal with the tetrahedral mesh.
 ! The BCs are just different compared to strutural case i.e. (3,7) -> (4,8).
 
-
 Header
   CHECK KEYWORDS Warn
   Mesh DB "." "winkel"
   Include Path ""
   Results Directory "results"
 End
-
 
 Simulation
   Max Output Level = 3
@@ -18,19 +16,15 @@ Simulation
   Steady State Max Iterations = 1
   Output Intervals = 1
 
-  Mesh Levels = 3
-
-  Output Level = 10
+  Mesh Levels = $ipar(0)
 
   Simulation Timing = Logical True
-  Post File = "case_fixedparams.vtu"
+!  Post File = "case.vtu"
 End
-
 
 Constants
   Stefan Boltzmann = 5.67e-08
 End
-
 
 Body 1
   Name = "Body"
@@ -39,12 +33,10 @@ Body 1
   Material = 1
 End
 
-
 Equation 1
   Name = "Equations"
   Active Solvers(1) = 1
 End
-
 
 ! Rest of the solver definitions exlucing the linear solver
 Solver 1
@@ -53,8 +45,7 @@ Solver 1
 
   Variable = -dofs 1 "Temperature"
 
-  !Procedure = "/scratch/elmer/jahokk/build_Elmer_devel/fem/tests/ModelPDEevol/ModelPDEevol.so" "AdvDiffSolver"
-Procedure = "./ModelPDEevol_fixedparams.so" "AdvDiffSolver"
+  Procedure = "./ModelPDEevol_fixedparams.so" "AdvDiffSolver"
 
   Nonlinear System Max Iterations = 1
   Nonlinear System Consistent Norm = True
@@ -66,6 +57,9 @@ Procedure = "./ModelPDEevol_fixedparams.so" "AdvDiffSolver"
   Linear System Timing = True
   Solver Timing = True
 
+! Add timings for bulk and boundary assembly separately. 
+  Bulk Assembly Timing = Logical True
+  Boundary Assembly Timing = Logical True
 
 !!!!!!!!!  Include the wanted solver here  !!!!!!!!!
 
@@ -74,6 +68,14 @@ Procedure = "./ModelPDEevol_fixedparams.so" "AdvDiffSolver"
   
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! What is the effect of these flags for multithreaded performance?
+! Multicolour assembly should eliminate the race conditions. 
+  Multicolour Solver = Logical True
+  Multicolour Consistent = Logical True
+
+! This uses vectorized assembly. It is default if there are more than
+! 1 thread. However, if only one the nonvectorized is the default.
+  Vector Assembly = Logical True
 End
 
 
@@ -88,8 +90,11 @@ Solver 2
   Operator 1 = dofs
   Operator 2 = elements
   Operator 3 = partitions
-  Operator 4 = norm
-  Operator 5 = cpu time
+  Operator 4 = threads
+  Operator 5 = norm
+  Operator 6 = cpu time
+
+  Expression 1 = Real $ipar(0)
 
 ! Give a unique tag to each line/method
   Line Marker = Integer $LinMethod$
@@ -104,19 +109,16 @@ Solver 2
   Parallel Reduce = True
 End
 
-
 Material 1
   Name = "Ideal"
   Diffusion Coefficient = Real 1.0
   Density = 1.0
 End
 
-
 Body Force 1
   Name = "Heating"
   Field Source = Real 1.0
 End
-
 
 Boundary Condition 1
   Name = "BC1"
@@ -124,13 +126,11 @@ Boundary Condition 1
   Temperature = 0.0
 End
 
-
 Boundary Condition 2
   Name = "BC2"
   Target Boundaries(1) = 8 
   Temperature = 0.0
 End
-
 
 Solver 1 :: Reference Norm = 1.42066313E+00
 Solver 1 :: Reference Norm Tolerance = 0.02
