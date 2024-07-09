@@ -47,10 +47,6 @@ Solver 1
 
   Variable = -dofs 1 "Temperature"
 
-<<<<<<< Updated upstream
-=======
-  !Procedure = "/scratch/elmer/jahokk/build_Elmer_devel/fem/tests/ModelPDEevol/ModelPDEevol.so" "AdvDiffSolver"
->>>>>>> Stashed changes
   Procedure = "./ModelPDEevol_fixedparams.so" "AdvDiffSolver"
 
   Nonlinear System Max Iterations = 1
