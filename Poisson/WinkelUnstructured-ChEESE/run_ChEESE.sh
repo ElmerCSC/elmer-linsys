@@ -20,9 +20,9 @@
 ####### change to numbers of nodes and MPI tasks ###
 ####### NB: we provide meshes for 128,256,512 and 1024 partitions #####
 #######     do the math by matching the product of next entries   #####
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=128
-#SBATCH --cpus-per-task=1
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node=64
+#SBATCH --cpus-per-task=2
 
 #SBATCH --exclusive                                                                                                                
 #SBATCH --mem=0 
@@ -50,5 +50,6 @@ ml use /appl/local/csc/modulefiles
 ###### this loads the PregEnv/gnu version ###
 ###### (using cray-libsci (BLAS, LAPACK)
 module load elmer/gcc-cray
+elmerf90 ModelPDEevol_fixedparams.F90 -o ModelPDEevol_fixedparams.so
 ###### make it so! #########
 srun ElmerSolver case_fixedparams.sif -ipar 1 2
