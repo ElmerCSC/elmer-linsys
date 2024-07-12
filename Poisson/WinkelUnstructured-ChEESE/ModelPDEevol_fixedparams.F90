@@ -77,7 +77,7 @@ SUBROUTINE AdvDiffSolver( Model,Solver,dt,TransientSimulation )
 
     !$OMP PARALLEL &
     !$OMP SHARED(Solver, Active, nColours, VecAsm) &
-    !$OMP PRIVATE(t, Element, n, nd, nb,col) &
+    !$OMP PRIVATE(t, Element, n, nd, nb,col, Inithandles) &
     !$OMP REDUCTION(+:totelem) DEFAULT(NONE)
    
     DO col=1,nColours
@@ -87,7 +87,7 @@ SUBROUTINE AdvDiffSolver( Model,Solver,dt,TransientSimulation )
       Active = GetNOFActive(Solver)
       !$OMP END SINGLE
 
-      !InitHandles = .TRUE.
+      InitHandles = .TRUE.
       !$OMP DO
       DO t=1,Active
         Element => GetActiveElement(t)
@@ -176,7 +176,7 @@ CONTAINS
     INTEGER :: i,t,p,q,dim,ngp,allocstat
     TYPE(GaussIntegrationPoints_t) :: IP
     TYPE(Nodes_t), SAVE :: Nodes
-    LOGICAL, SAVE :: FirstTime=.TRUE.
+    !LOGICAL, SAVE :: FirstTime=.TRUE.
     
     !$OMP THREADPRIVATE(Basis, dBasisdx, DetJ, &
     !$OMP               MASS, STIFF, FORCE, Nodes, &
@@ -194,12 +194,45 @@ CONTAINS
     ngp = IP % n
 
     ! THIS IS UGLY AND DIRTY - assuming all elements are same!
-    IF (FirstTime) THEN
-      ALLOCATE(DiffCoeff(ngp), ConvCoeff(ngp), ReactCoeff(ngp), &
+!!$    IF (FirstTime) THEN
+!!$      ALLOCATE(DiffCoeff(ngp), ConvCoeff(ngp), ReactCoeff(ngp), &
+!!$           TimeCoeff(ngp), SourceCoeff(ngp), Velo1Coeff(ngp), Velo2Coeff(ngp),&
+!!$           Velo3Coeff(ngp), VeloCoeff(ngp,3), MASS(nd,nd), STIFF(nd,nd), FORCE(nd),&
+!!$           Basis(ngp,nd), dBasisdx(ngp,nd,3), DetJ(ngp), &
+!!$           STAT=allocstat)
+!!$      DiffCoeff = 1.0_dp
+!!$      ConvCoeff=0.0_dp
+!!$      ReactCoeff=0.0_dp
+!!$      TimeCoeff=0.0_dp
+!!$      SourceCoeff=1.0_dp
+!!$      Velo1Coeff=0.0_dp
+!!$      Velo2Coeff=0.0_dp
+!!$      Velo3Coeff=0.0_dp
+!!$      IF (allocstat /= 0) THEN
+!!$        CALL Fatal(Caller,'Local storage allocation failed')
+!!$      END IF
+!!$      FirstTime=.FALSE.
+!!$    END IF
+    
+    ! Deallocate storage if needed
+    IF (ALLOCATED(Basis)) THEN
+      IF (SIZE(Basis,1) < ngp .OR. SIZE(Basis,2) < nd) &
+            DEALLOCATE(Basis,dBasisdx, DetJ, MASS, STIFF, FORCE, VeloCoeff, DiffCoeff, ConvCoeff, ReactCoeff, &
+            TimeCoeff, SourceCoeff, Velo1Coeff, Velo2Coeff, Velo3Coeff)
+    END IF
+
+    ! Allocate storage if needed
+    IF (.NOT. ALLOCATED(Basis)) THEN
+      ALLOCATE(Basis(ngp,nd), dBasisdx(ngp,nd,3), DetJ(ngp), &
+           MASS(nd,nd), STIFF(nd,nd), FORCE(nd), &
+           DiffCoeff(ngp), ConvCoeff(ngp), ReactCoeff(ngp), &
            TimeCoeff(ngp), SourceCoeff(ngp), Velo1Coeff(ngp), Velo2Coeff(ngp),&
-           Velo3Coeff(ngp), VeloCoeff(ngp,3), MASS(nd,nd), STIFF(nd,nd), FORCE(nd),&
-           Basis(ngp,nd), dBasisdx(ngp,nd,3), DetJ(ngp), &
+           Velo3Coeff(ngp), VeloCoeff(ngp,3), &
            STAT=allocstat)
+      
+      IF (allocstat /= 0) THEN
+        CALL Fatal(Caller,'Local storage allocation failed')
+      END IF
       DiffCoeff = 1.0_dp
       ConvCoeff=0.0_dp
       ReactCoeff=0.0_dp
@@ -208,27 +241,7 @@ CONTAINS
       Velo1Coeff=0.0_dp
       Velo2Coeff=0.0_dp
       Velo3Coeff=0.0_dp
-      IF (allocstat /= 0) THEN
-        CALL Fatal(Caller,'Local storage allocation failed')
-      END IF
-      FirstTime=.FALSE.
-    END IF
-    
-    ! Deallocate storage if needed
-!    IF (ALLOCATED(Basis)) THEN
-!      IF (SIZE(Basis,1) < ngp .OR. SIZE(Basis,2) < nd) &
-!            DEALLOCATE(Basis,dBasisdx, DetJ, MASS, STIFF, FORCE, VeloCoeff )
-!    END IF
-
-    ! Allocate storage if needed
- !   IF (.NOT. ALLOCATED(Basis)) THEN
- !     ALLOCATE(Basis(ngp,nd), dBasisdx(ngp,nd,3), DetJ(ngp), &
- !         MASS(nd,nd), STIFF(nd,nd), FORCE(nd), VeloCoeff(ngp,3), STAT=allocstat)
-      
- !     IF (allocstat /= 0) THEN
- !       CALL Fatal(Caller,'Local storage allocation failed')
- !     END IF
- !   END IF
+     END IF
 
     CALL GetElementNodesVec( Nodes, UElement=Element )
 

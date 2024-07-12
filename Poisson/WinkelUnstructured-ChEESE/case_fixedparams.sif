@@ -9,7 +9,7 @@ Header
 End
 
 Simulation
-  Max Output Level = 3
+  Max Output Level = 10
 
   Coordinate System = "Cartesian"
   Simulation Type = "Steady State"
@@ -41,7 +41,7 @@ End
 ! Rest of the solver definitions exlucing the linear solver
 Solver 1
   Exec Solver = "Always"
-  Equation = "HeatEquation"
+  Equation = "ModelPDEevol"
 
   Variable = -dofs 1 "Temperature"
 
