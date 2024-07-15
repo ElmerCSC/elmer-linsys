@@ -22,7 +22,6 @@
 #######     do the math by matching the product of next entries   #####
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=64
-#SBATCH --cpus-per-task=2
 
 #SBATCH --exclusive                                                                                                                
 #SBATCH --mem=0 
@@ -31,7 +30,8 @@
 ## use only if you undersubscribe
 ## the MPI tasks
 ##########################################
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=2
+
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 echo "running OpenMP on $SLURM_CPUS_PER_TASK"
 #export KMP_AFFINITY=compact
