@@ -1,0 +1,3 @@
+linsys/elmer_iter_CG_ILU0.sif
+linsys/elmer_iter_Idrs5_ILU0.sif
+linsys/hypre_BiCGStab_Parasails.sif

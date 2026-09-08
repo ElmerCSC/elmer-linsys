@@ -1,0 +1,7 @@
+******: amgx-bicgstab_none
+******: amgx-cg_amg
+******: amgx-idr_dilu
+******: amgx-cg_amg
+******: amgx-cg_dilu
+******: amgx-cg_amg_bj
+******: amgx-cg_amg_cheby

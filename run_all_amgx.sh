@@ -1,11 +1,11 @@
 #!/bin/bash
-#SBATCH --time=00:20:00
+#SBATCH --time=00:15:00
 #SBATCH --job-name=amgx_all
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
 #SBATCH --partition=gpumedium
 #SBATCH --gres=gpu:a100:4,nvme:950
-#SBATCH --account=project_2001628
+#SBATCH --account=project_2001659
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=4
 
@@ -29,7 +29,11 @@ partitions=4
 # default case file in the folder
 cp $path/case_amgx.sif $path/case.sif
 
-for mesh_level in 3 4 5; do
+cd $path
+gmsh winkel.geo -3 -clscale 1.0 -v 5
+ElmerGrid 14 2 winkel.msh -autoclean -partdual -metiskway $partitions
+cd ../..
+for mesh_level in 1; do
 
     for solver in linsysAMGX/*.sif; do
 

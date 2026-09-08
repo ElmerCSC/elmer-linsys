@@ -1,11 +1,11 @@
 #!/bin/bash
-#SBATCH --time=00:20:00
+#SBATCH --time=00:15:00
 #SBATCH --job-name=amgx_single
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
 #SBATCH --partition=gpumedium
 #SBATCH --gres=gpu:a100:4,nvme:950
-#SBATCH --account=project_2001628
+#SBATCH --account=project_2001659
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=4
 

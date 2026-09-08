@@ -1,0 +1,22 @@
+amgx-cg_dilu
+Metadata for SaveScalars file: results_amgx_density_015/f32.dat
+Elmer version: 26.2
+Elmer revision: 621b04143
+Elmer compilation date: 2026-07-24
+Solver input file: case_gpu_385723.sif
+File started at: 2026/07/30 13:54:31
+ 
+Variables in columns of matrix: 
+   1: Line Marker
+   2: dofs: displacement : mpi_sum
+   3: elements: displacement : mpi_sum
+   4: value: number of partitions
+   5: norm: displacement
+   6: value: cpu time (s)
+   7: simulation: cpu time (s)
+   8: simulation: real time (s)
+   9: res: linsys cpu time displacement
+  10: res: linsys real time displacement
+  11: res: solver cpu time linelast
+  12: res: solver real time linelast
+  13: expression 1

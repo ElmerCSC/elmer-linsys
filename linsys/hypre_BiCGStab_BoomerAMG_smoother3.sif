@@ -12,7 +12,7 @@ Linear System Residual Output = 20
 Linear System Preconditioning = "boomeramg"
 
 BoomerAMG Relax Type = Integer 3
-BoomerAMG Coarsen Type = Integer 0
+BoomerAMG Coarsen Type = Integer 8 ! was 0 (classical RS, not parallel-consistent -- converged in 0 iters at 1536 ranks but stalled at 10000/10000 at 768 ranks); 8 = PMIS, parallel-robust
 BoomerAMG Num Sweeps = Integer 1
 Boomeramg Max Levels = Integer 25
 BoomerAMG Interpolation Type = Integer 0

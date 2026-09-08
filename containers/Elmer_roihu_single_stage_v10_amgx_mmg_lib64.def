@@ -1,0 +1,559 @@
+Bootstrap: docker
+From: satama.csc.fi/r_installation_spack/core-gpu-gcc-14.3.0-cuda-12.9.1:v2026_03
+
+%labels
+    Authors sarastel danieree
+    Description "Elmer/Ice Energy build on CSC Roihu GPU base image"
+
+%post -c /bin/bash
+    set -euxo pipefail
+
+    # -------------------------------------------------------------------------
+    # Roihu base environment
+    # -------------------------------------------------------------------------
+    . /opt/activate.sh
+
+    # Roihu GPU nodes are GH/Hopper class. Use sm_90 for the Roihu CUDA build.
+    # Set ENABLE_NVPTX_OFFLOAD=1 only if you specifically need GCC OpenMP
+    # offload in Elmer Fortran code and the base GCC supports nvptx offload.
+    JOBS="$(nproc)"
+    CUDA_ARCH="90"
+    ENABLE_NVPTX_OFFLOAD="0"
+
+    export CUDA_HOME="${CUDA_HOME:-${CUDA_PATH:-/usr/local/cuda}}"
+    export PATH="/usr/local/bin:${CUDA_HOME}/bin:${PATH}"
+    export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH:-}"
+    export LIBRARY_PATH="${CUDA_HOME}/lib64:${LIBRARY_PATH:-}"
+    export CPATH="${CUDA_HOME}/include:${CPATH:-}"
+
+    command -v gcc
+    command -v g++
+    command -v gfortran
+    command -v mpicc
+    command -v mpicxx
+    command -v mpif90
+    command -v nvcc
+
+    # -------------------------------------------------------------------------
+    # Rocky/RHEL packages. Do not use apt-get in the Roihu base image.
+    # useradd/groupadd stubs avoid common fakeroot package-scriptlet failures.
+    # -------------------------------------------------------------------------
+    cp /usr/bin/true /usr/sbin/useradd || true
+    cp /usr/bin/true /usr/sbin/groupadd || true
+
+    dnf -y install dnf-plugins-core || true
+    dnf config-manager --set-enabled crb || true
+    dnf -y install epel-release || true
+    dnf -y makecache || true
+
+    dnf -y install \
+        autoconf \
+        automake \
+        bzip2 \
+        ca-certificates \
+        curl \
+        diffutils \
+        file \
+        findutils \
+        git \
+        libcurl-devel \
+        libtool \
+        make \
+        patch \
+        perl \
+        pkgconf \
+        python3 \
+        tar \
+        wget \
+        which \
+        xz \
+        m4 \
+        zlib \
+        zlib-devel \
+        blas-devel \
+        lapack-devel \
+        suitesparse-devel
+
+    dnf clean all
+    ldconfig
+
+    # Keep source/build trees off /tmp or /var/tmp. On some HPC systems those
+    # locations can be mounted noexec or behave oddly under rootless/fakeroot
+    # builds, which makes Autotools ./configure fail with "Permission denied".
+    mkdir -p /opt/src
+    chmod 1777 /opt/src || true
+
+    # -------------------------------------------------------------------------
+    # CMake 3.31.4, matching the Ubuntu/Thea recipe. Roihu is aarch64.
+    # -------------------------------------------------------------------------
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://github.com/Kitware/CMake/releases/download/v3.31.4/cmake-3.31.4-linux-aarch64.sh
+    mkdir -p /usr/local
+    /bin/sh /opt/src/cmake-3.31.4-linux-aarch64.sh --prefix=/usr/local --skip-license
+    rm -f /opt/src/cmake-3.31.4-linux-aarch64.sh
+    cmake --version
+
+    # -------------------------------------------------------------------------
+    # HDF5 + NetCDF C + NetCDF Fortran
+    # Rocky/EPEL on this Roihu image does not provide netcdf-devel/netcdf-fortran-devel
+    # for aarch64, so build the NetCDF stack locally under /opt.
+    # -------------------------------------------------------------------------
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz
+    tar -xzf /opt/src/hdf5-1.14.6.tar.gz -C /opt/src
+    cd /opt/src/hdf5-1.14.6
+    chmod -R u+rwX . || true
+    bash ./configure \
+        --prefix=/opt/hdf5 \
+        --enable-shared \
+        --disable-static \
+        --with-zlib \
+        CC=gcc \
+        CFLAGS="-O2 -fPIC"
+    make -j"${JOBS}"
+    make install
+    rm -rf /opt/src/hdf5-1.14.6 /opt/src/hdf5-1.14.6.tar.gz
+
+    export PATH="/opt/hdf5/bin:${PATH}"
+    export LD_LIBRARY_PATH="/opt/hdf5/lib:${LD_LIBRARY_PATH:-}"
+    export LIBRARY_PATH="/opt/hdf5/lib:${LIBRARY_PATH:-}"
+    export CPATH="/opt/hdf5/include:${CPATH:-}"
+    export PKG_CONFIG_PATH="/opt/hdf5/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netcdf-c-4.9.2.tar.gz
+    tar -xzf /opt/src/netcdf-c-4.9.2.tar.gz -C /opt/src
+    cd /opt/src/netcdf-c-4.9.2
+    chmod -R u+rwX . || true
+    CPPFLAGS="-I/opt/hdf5/include" \
+    LDFLAGS="-L/opt/hdf5/lib" \
+    LD_LIBRARY_PATH="/opt/hdf5/lib:${LD_LIBRARY_PATH:-}" \
+    bash ./configure \
+        --prefix=/opt/netcdf \
+        --enable-netcdf-4 \
+        --disable-dap \
+        --disable-byterange \
+        --disable-libxml2 \
+        CC=gcc \
+        CFLAGS="-O2 -fPIC"
+    make -j"${JOBS}"
+    make install
+    rm -rf /opt/src/netcdf-c-4.9.2 /opt/src/netcdf-c-4.9.2.tar.gz
+
+    export PATH="/opt/netcdf/bin:${PATH}"
+    export LD_LIBRARY_PATH="/opt/netcdf/lib:/opt/hdf5/lib:${LD_LIBRARY_PATH:-}"
+    export LIBRARY_PATH="/opt/netcdf/lib:/opt/hdf5/lib:${LIBRARY_PATH:-}"
+    export CPATH="/opt/netcdf/include:/opt/hdf5/include:${CPATH:-}"
+    export PKG_CONFIG_PATH="/opt/netcdf/lib/pkgconfig:/opt/hdf5/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://downloads.unidata.ucar.edu/netcdf-fortran/4.6.1/netcdf-fortran-4.6.1.tar.gz
+    tar -xzf /opt/src/netcdf-fortran-4.6.1.tar.gz -C /opt/src
+    cd /opt/src/netcdf-fortran-4.6.1
+    chmod -R u+rwX . || true
+    CPPFLAGS="-I/opt/netcdf/include -I/opt/hdf5/include" \
+    LDFLAGS="-L/opt/netcdf/lib -L/opt/hdf5/lib" \
+    LD_LIBRARY_PATH="/opt/netcdf/lib:/opt/hdf5/lib:${LD_LIBRARY_PATH:-}" \
+    bash ./configure \
+        --prefix=/opt/netcdf \
+        CC=gcc \
+        FC=gfortran \
+        CFLAGS="-O2 -fPIC" \
+        FCFLAGS="-O2 -fPIC"
+    make -j"${JOBS}"
+    make install
+    rm -rf /opt/src/netcdf-fortran-4.6.1 /opt/src/netcdf-fortran-4.6.1.tar.gz
+
+    # Make /opt libraries visible to ldconfig and to later CMake probes.
+    cat > /etc/ld.so.conf.d/elmer-roihu-opt.conf <<'EOF'
+/opt/hdf5/lib
+/opt/netcdf/lib
+/opt/elmer/lib
+/opt/gmsh/lib
+/opt/parmetis/lib
+/opt/metis/lib
+/opt/hypre/lib
+/opt/nn/lib
+/opt/csa/lib
+/opt/mmg/lib
+/opt/parmmg/lib
+/opt/amgx/lib
+/opt/lua/lib
+EOF
+    ldconfig
+
+    nc-config --all || true
+    nf-config --all || true
+
+    # Common build/runtime paths for locally built libraries.
+    export PATH="/opt/elmer/bin:/opt/gmsh/bin:/opt/parmetis/bin:/opt/metis/bin:/opt/hypre/bin:/opt/nn/bin:/opt/csa/bin:/opt/mmg/bin:/opt/parmmg/bin:/opt/lua/bin:/opt/netcdf/bin:/opt/hdf5/bin:${PATH}"
+    export LD_LIBRARY_PATH="/opt/elmer/lib:/opt/gmsh/lib:/opt/parmetis/lib:/opt/metis/lib:/opt/hypre/lib:/opt/nn/lib:/opt/csa/lib:/opt/mmg/lib64:/opt/mmg/lib:/opt/parmmg/lib64:/opt/parmmg/lib:/opt/amgx/lib:/opt/lua/lib:/opt/netcdf/lib:/opt/hdf5/lib:${LD_LIBRARY_PATH:-}"
+    export LIBRARY_PATH="/opt/elmer/lib:/opt/gmsh/lib:/opt/parmetis/lib:/opt/metis/lib:/opt/hypre/lib:/opt/nn/lib:/opt/csa/lib:/opt/mmg/lib64:/opt/mmg/lib:/opt/parmmg/lib64:/opt/parmmg/lib:/opt/amgx/lib:/opt/lua/lib:/opt/netcdf/lib:/opt/hdf5/lib:${LIBRARY_PATH:-}"
+    export CPATH="/opt/parmetis/include:/opt/metis/include:/opt/hypre/include:/opt/nn/include:/opt/csa/include:/opt/mmg/include:/opt/parmmg/include:/opt/amgx/include:/opt/lua/include:/opt/netcdf/include:/opt/hdf5/include:${CPATH:-}"
+    export CMAKE_PREFIX_PATH="/opt/elmer:/opt/gmsh:/opt/parmetis:/opt/metis:/opt/hypre:/opt/nn:/opt/csa:/opt/mmg:/opt/parmmg:/opt/amgx:/opt/lua:/opt/netcdf:/opt/hdf5:${CMAKE_PREFIX_PATH:-}"
+
+    # -------------------------------------------------------------------------
+    # METIS 5.1.0
+    # The upstream Ubuntu recipe copied libmetis from /usr/lib/aarch64-linux-gnu.
+    # On Rocky/Roihu we install our own copy under /opt/metis instead.
+    # -------------------------------------------------------------------------
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://karypis.github.io/glaros/files/sw/metis/metis-5.1.0.tar.gz
+    tar -xzf /opt/src/metis-5.1.0.tar.gz -C /opt/src
+    cd /opt/src/metis-5.1.0
+    make config prefix=/opt/metis shared=1 cc=gcc
+    make -j"${JOBS}"
+    make install
+    rm -rf /opt/src/metis-5.1.0 /opt/src/metis-5.1.0.tar.gz
+    ldconfig
+
+    # -------------------------------------------------------------------------
+    # ParMETIS 4.0.3
+    # -------------------------------------------------------------------------
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://ftp.mcs.anl.gov/pub/pdetools/spack-pkgs/parmetis-4.0.3.tar.gz
+    tar -xzf /opt/src/parmetis-4.0.3.tar.gz -C /opt/src
+    cd /opt/src/parmetis-4.0.3
+    CC=mpicc CXX=mpicxx make config shared=1 prefix=/opt/parmetis
+    make -j"${JOBS}"
+    make install
+    cp -av /opt/metis/lib/libmetis.so* /opt/parmetis/lib/ || true
+    cp -av /opt/metis/include/metis.h /opt/parmetis/include/ || true
+    rm -rf /opt/src/parmetis-4.0.3 /opt/src/parmetis-4.0.3.tar.gz
+    ldconfig
+
+    # -------------------------------------------------------------------------
+    # Gmsh 4.13.1, headless build
+    # -------------------------------------------------------------------------
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://gmsh.info/src/gmsh-4.13.1-source.tgz
+    tar -xzf /opt/src/gmsh-4.13.1-source.tgz -C /opt/src
+    cmake -S /opt/src/gmsh-4.13.1-source -B /opt/src/gmsh-4.13.1-source/build \
+        -DCMAKE_INSTALL_PREFIX=/opt/gmsh \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DENABLE_FLTK=OFF \
+        -DENABLE_OPENGL=OFF \
+        -DCMAKE_C_COMPILER=gcc \
+        -DCMAKE_CXX_COMPILER=g++ \
+        -DCMAKE_Fortran_COMPILER=gfortran \
+        -DCMAKE_C_FLAGS="-D_GNU_SOURCE -O2 -fPIC" \
+        -DCMAKE_CXX_FLAGS="-O2 -fPIC"
+    cmake --build /opt/src/gmsh-4.13.1-source/build --target all -- -j"${JOBS}"
+    cmake --build /opt/src/gmsh-4.13.1-source/build --target install -- -j"${JOBS}"
+    rm -rf /opt/src/gmsh-4.13.1-source /opt/src/gmsh-4.13.1-source.tgz
+
+    # -------------------------------------------------------------------------
+    # hypre 2.33.0
+    # -------------------------------------------------------------------------
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://github.com/hypre-space/hypre/archive/refs/tags/v2.33.0.tar.gz
+    tar -xzf /opt/src/v2.33.0.tar.gz -C /opt/src
+    cd /opt/src/hypre-2.33.0/src
+    chmod -R u+rwX . || true
+    # --enable-unified-memory: should be tested if it doesn't hurt performance (probably does)
+    # enable hypre to run on gpu
+    bash ./configure \
+        --with-cuda \
+        --with-gpu-arch="${CUDA_ARCH}" \
+        --enable-unified-memory \
+        --with-cxxstandard=14 \
+        --with-openmp \
+        --with-blas \
+        --with-lapack \
+        --prefix=/opt/hypre \
+        CC=mpicc \
+        CXX=mpicxx \
+        FC=mpif90 \
+        CFLAGS="-fPIC -O3" \
+        CXXFLAGS="-fPIC -O3" \
+        FFLAGS="-fPIC -O3"
+    make -j"${JOBS}"
+    make install
+    rm -rf /opt/src/hypre-2.33.0 /opt/src/v2.33.0.tar.gz
+    ldconfig
+
+    # -------------------------------------------------------------------------
+    # nn-c 1.85.0
+    # -------------------------------------------------------------------------
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://github.com/sakov/nn-c/archive/refs/tags/v1.85.0.tar.gz
+    tar -xzf /opt/src/v1.85.0.tar.gz -C /opt/src
+    cd /opt/src/nn-c-1.85.0/nn
+    chmod -R u+rwX . || true
+    CFLAGS="-fPIC -O3 -march=native -ffast-math -funroll-loops" bash ./configure --prefix=/opt/nn
+    make clean || true
+    gcc -c -DTRILIBRARY -fPIC -O2 -w -ffloat-store -I. triangle.c
+    make -j"${JOBS}" install
+    rm -rf /opt/src/nn-c-1.85.0 /opt/src/v1.85.0.tar.gz
+
+    # -------------------------------------------------------------------------
+    # csa-c 1.22.0
+    # -------------------------------------------------------------------------
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://github.com/sakov/csa-c/archive/refs/tags/v1.22.0.tar.gz
+    tar -xzf /opt/src/v1.22.0.tar.gz -C /opt/src
+    cd /opt/src/csa-c-1.22.0/csa
+    chmod -R u+rwX . || true
+    bash ./configure --prefix=/opt/csa CC="gcc -fPIC -O3 -march=native"
+    make -j"${JOBS}"
+    make install
+    rm -rf /opt/src/csa-c-1.22.0 /opt/src/v1.22.0.tar.gz
+
+    # -------------------------------------------------------------------------
+    # MMG 5.8.0
+    # -------------------------------------------------------------------------
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://github.com/MmgTools/mmg/archive/refs/tags/v5.8.0.tar.gz
+    tar -xzf /opt/src/v5.8.0.tar.gz -C /opt/src
+    cmake -S /opt/src/mmg-5.8.0 -B /opt/src/mmg-5.8.0/build \
+        -DCMAKE_INSTALL_PREFIX=/opt/mmg \
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DBUILD_SHARED_LIBS=TRUE \
+        -DMMG_INSTALL_PRIVATE_HEADERS=ON \
+        -DCMAKE_C_FLAGS="-fPIC -g" \
+        -DCMAKE_CXX_FLAGS="-fPIC -std=c++11 -g" \
+        -DCMAKE_C_COMPILER=gcc \
+        -DCMAKE_CXX_COMPILER=g++ \
+        -DCMAKE_Fortran_COMPILER=gfortran
+    cmake --build /opt/src/mmg-5.8.0/build --target all -- -j"${JOBS}"
+    cmake --build /opt/src/mmg-5.8.0/build --target install -- -j"${JOBS}"
+    # MMG installs libraries to lib64 on Rocky/aarch64. Keep both lib64 and lib
+    # paths available because Elmer's CMake modules and older recipes often
+    # assume /opt/mmg/lib.
+    if [ -d /opt/mmg/lib64 ]; then
+        mkdir -p /opt/mmg/lib
+        ln -sf /opt/mmg/lib64/libmmg*.so* /opt/mmg/lib/
+    fi
+    rm -rf /opt/src/mmg-5.8.0 /opt/src/v5.8.0.tar.gz
+
+    # -------------------------------------------------------------------------
+    # ParMmg 1.5.0
+    # -------------------------------------------------------------------------
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://github.com/MmgTools/ParMmg/archive/refs/tags/v1.5.0.tar.gz
+    tar -xzf /opt/src/v1.5.0.tar.gz -C /opt/src
+    cmake -S /opt/src/ParMmg-1.5.0 -B /opt/src/ParMmg-1.5.0/build \
+        -DCMAKE_INSTALL_PREFIX=/opt/parmmg \
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DBUILD_SHARED_LIBS=TRUE \
+        -DDOWNLOAD_MMG=OFF \
+        -DMMG_DIR=/opt/mmg \
+        -DCMAKE_C_FLAGS="-fPIC -g" \
+        -DCMAKE_CXX_FLAGS="-fPIC -std=c++11 -g" \
+        -DCMAKE_C_COMPILER=mpicc \
+        -DCMAKE_CXX_COMPILER=mpicxx \
+        -DCMAKE_Fortran_COMPILER=mpif90 \
+        -DMPI_C_COMPILER=mpicc \
+        -DMPI_CXX_COMPILER=mpicxx \
+        -DMPI_Fortran_COMPILER=mpif90
+    cmake --build /opt/src/ParMmg-1.5.0/build --target all -- -j"${JOBS}"
+    cmake --build /opt/src/ParMmg-1.5.0/build --target install -- -j"${JOBS}"
+    # ParMmg also installs to lib64 on Rocky/aarch64; provide /opt/parmmg/lib
+    # compatibility symlinks.
+    if [ -d /opt/parmmg/lib64 ]; then
+        mkdir -p /opt/parmmg/lib
+        ln -sf /opt/parmmg/lib64/libparmmg*.so* /opt/parmmg/lib/
+    fi
+    rm -rf /opt/src/ParMmg-1.5.0 /opt/src/v1.5.0.tar.gz
+
+    # -------------------------------------------------------------------------
+    # AMGX at the same commit as the Ubuntu/Thea recipe
+    # -------------------------------------------------------------------------
+    cd /opt/src
+    git clone --recursive https://github.com/NVIDIA/amgx amgx
+    cd /opt/src/amgx
+    git checkout 3188dce5bdc22e96407d609e398925bed6aa010d
+    git submodule update --init --recursive
+    cmake -S /opt/src/amgx -B /opt/src/amgx/build \
+        -DCMAKE_INSTALL_PREFIX=/opt/amgx \
+        -DCUDA_ARCH="${CUDA_ARCH}" \
+        -DCUDA_TOOLKIT_ROOT_DIR="${CUDA_HOME}" \
+        -DCUDAToolkit_ROOT="${CUDA_HOME}" \
+        -DCMAKE_C_COMPILER=gcc \
+        -DCMAKE_CXX_COMPILER=g++ \
+        -DCMAKE_Fortran_COMPILER=gfortran \
+        -DMPI_C_COMPILER=mpicc \
+        -DMPI_CXX_COMPILER=mpicxx \
+        -DMPI_Fortran_COMPILER=mpif90 \
+        -DCMAKE_C_FLAGS="-O3 -march=native -ffast-math -funroll-loops" \
+        -DCMAKE_CXX_FLAGS="-O3 -march=native -ffast-math -funroll-loops" \
+        -DCMAKE_Fortran_FLAGS="-O3 -march=native -ffast-math -funroll-loops"
+    cmake --build /opt/src/amgx/build --target all -- -j"${JOBS}"
+    cmake --build /opt/src/amgx/build --target install -- -j"${JOBS}"
+    rm -rf /opt/src/amgx
+    ldconfig
+
+    # -------------------------------------------------------------------------
+    # Lua 5.4.7
+    # -------------------------------------------------------------------------
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://www.lua.org/ftp/lua-5.4.7.tar.gz
+    tar -xzf /opt/src/lua-5.4.7.tar.gz -C /opt/src
+    cd /opt/src/lua-5.4.7
+    make linux MYCFLAGS="-fPIC" MYLDFLAGS="-Wl,-E" -j"${JOBS}"
+    make install INSTALL_TOP=/opt/lua
+    rm -rf /opt/src/lua-5.4.7 /opt/src/lua-5.4.7.tar.gz
+    ldconfig
+
+    # -------------------------------------------------------------------------
+    # Elmer FEM / ElmerIce at same commit as the Ubuntu/Thea recipe
+    # -------------------------------------------------------------------------
+    NETCDF_C_LIB="$(find /opt/netcdf/lib -maxdepth 1 -name 'libnetcdf.so*' | sort | head -n1)"
+    NETCDF_F_LIB="$(find /opt/netcdf/lib -maxdepth 1 -name 'libnetcdff.so*' | sort | head -n1)"
+    # Prefer the upstream Ice/Thea behavior: link the static AMGX archive.
+    # Fall back to the shared AMGX library if AMGX installs only that.
+    AMGX_LIBRARY="$(find /opt/amgx/lib -maxdepth 1 -name 'libamgx.a' | head -n1)"
+    if [ -z "${AMGX_LIBRARY}" ]; then
+        AMGX_LIBRARY="$(find /opt/amgx/lib -maxdepth 1 -name 'libamgxsh.so' | head -n1)"
+    fi
+
+    test -n "${NETCDF_C_LIB}"
+    test -n "${NETCDF_F_LIB}"
+    test -n "${AMGX_LIBRARY}"
+
+    ELMER_FFLAGS="-g -O2 -fPIC -fopenmp"
+    if [ "${ENABLE_NVPTX_OFFLOAD}" = "1" ]; then
+        ELMER_FFLAGS="${ELMER_FFLAGS} -foffload=nvptx-none=-march=sm_${CUDA_ARCH}"
+    fi
+
+    cd /opt/src
+    git clone --recursive --branch devel https://github.com/dancaseb/elmerfem.git elmerfem
+    cd /opt/src/elmerfem
+    git submodule update --init --recursive
+
+    # Elmer's FindAMGX.cmake was written for CUDA releases that still shipped
+    # the legacy nvToolsExt link library. CUDA 12.9 provides NVTX v3 as headers,
+    # so do not add CUDA_nvToolsExt_LIBRARY when FindCUDA leaves it NOTFOUND.
+    # AMGX's static lib also calls cuRAND (curandCreateGenerator etc.) internally,
+    # but FindAMGX.cmake never added it to CUDA_LIBRARIES, so add it here too.
+    python3 - <<'PY_AMGX_NVTX_PATCH'
+from pathlib import Path
+p = Path('/opt/src/elmerfem/cmake/Modules/FindAMGX.cmake')
+s = p.read_text()
+old = 'SET(CUDA_LIBRARIES ${CUDA_LIBRARIES} ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_nvToolsExt_LIBRARY})'
+new = '''IF (CUDA_nvToolsExt_LIBRARY AND NOT CUDA_nvToolsExt_LIBRARY MATCHES "NOTFOUND")
+  SET(CUDA_NVTX_COMPAT_LIBRARY ${CUDA_nvToolsExt_LIBRARY})
+ELSE()
+  SET(CUDA_NVTX_COMPAT_LIBRARY dl)
+ENDIF()
+SET(CUDA_LIBRARIES ${CUDA_LIBRARIES} ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_curand_LIBRARY} ${CUDA_NVTX_COMPAT_LIBRARY})'''
+if old not in s:
+    raise SystemExit('Could not patch FindAMGX.cmake: expected CUDA_LIBRARIES line not found')
+p.write_text(s.replace(old, new))
+PY_AMGX_NVTX_PATCH
+    grep -n "CUDA_NVTX_COMPAT_LIBRARY\|CUDA_curand_LIBRARY" /opt/src/elmerfem/cmake/Modules/FindAMGX.cmake
+
+    # GCC 14 is stricter about incompatible pointer types. Elmer's bundled
+    # Zoltan Fortran wrapper declares the local handle volatile, then passes
+    # &lb to Zoltan_Destroy(), which expects struct Zoltan_Struct **. Patch the
+    # one hard error while leaving the rest as warnings.
+    python3 - <<'PY_ZOLTAN_GCC14_PATCH'
+from pathlib import Path
+p = Path('/opt/src/elmerfem/contrib/Zoltan_v3.83/src/fort/cwrap.c')
+s = p.read_text()
+old = '   Zoltan_Destroy(&lb);'
+new = '   Zoltan_Destroy((struct Zoltan_Struct **)(void *)&lb);'
+if old in s:
+    p.write_text(s.replace(old, new, 1))
+elif '   Zoltan_Destroy((struct Zoltan_Struct **)&lb);' in s:
+    pass  # already cast — GCC 14 only errors on the bare, uncast form
+else:
+    raise SystemExit('Could not patch Zoltan cwrap.c: no known Zoltan_Destroy(&lb) variant found')
+PY_ZOLTAN_GCC14_PATCH
+    grep -n "Zoltan_Destroy" /opt/src/elmerfem/contrib/Zoltan_v3.83/src/fort/cwrap.c | head
+
+    cmake -S /opt/src/elmerfem -B /opt/src/elmerfem/build \
+        -DCMAKE_INSTALL_PREFIX=/opt/elmer \
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_C_COMPILER=gcc \
+        -DCMAKE_CXX_COMPILER=g++ \
+        -DCMAKE_Fortran_COMPILER=gfortran \
+        -DMPI_C_COMPILER=mpicc \
+        -DMPI_CXX_COMPILER=mpicxx \
+        -DMPI_Fortran_COMPILER=mpif90 \
+        -DCMAKE_C_FLAGS="-g -O3" \
+        -DCMAKE_CXX_FLAGS="-g -O3" \
+        -DCMAKE_Fortran_FLAGS="${ELMER_FFLAGS}" \
+        -DCMAKE_Fortran_FLAGS_RELWITHDEB="${ELMER_FFLAGS} -DNDEBUG" \
+        -DWITH_MPI=TRUE \
+        -DWITH_LUA=TRUE \
+        -DWITH_OpenMP=TRUE \
+        -DWITH_Mumps=FALSE \
+        -DWITH_Hypre=TRUE \
+        -DHYPRE_INCLUDE_DIR=/opt/hypre/include \
+        -DHYPRE_LIBRARY=/opt/hypre/lib/libHYPRE.so \
+        -DWITH_NETCDF=TRUE \
+        -DNETCDF_LIBRARY="${NETCDF_C_LIB}" \
+        -DNETCDFF_LIBRARY="${NETCDF_F_LIB}" \
+        -DNETCDF_INCLUDE_DIR=/opt/netcdf/include \
+        -DWITH_Zoltan=TRUE \
+        -DWITH_Trilinos=FALSE \
+        -DWITH_ELMERGUI=FALSE \
+        -DWITH_GridDataReader=TRUE \
+        -DWITH_ScatteredDataInterpolator=TRUE \
+        -DEXTERNAL_UMFPACK=FALSE \
+        -DWITH_CHOLMOD=FALSE \
+        -DMetis_LIBRARIES=/opt/metis/lib/libmetis.so \
+        -DMetis_INCLUDE_DIR=/opt/metis/include \
+        -DParMetis_LIBRARIES="/opt/metis/lib/libmetis.so;/opt/parmetis/lib/libparmetis.so" \
+        -DParMetis_INCLUDE_DIR=/opt/parmetis/include \
+        -DWITH_AMGX=TRUE \
+        -DAMGX_ROOT=/opt/amgx \
+        -DAMGX_INCLUDE_DIR="/opt/amgx/include;${CUDA_HOME}/include" \
+        -DAMGX_LIBRARY="${AMGX_LIBRARY}" \
+        -DCUDA_TOOLKIT_ROOT_DIR="${CUDA_HOME}" \
+        -DCUDAToolkit_ROOT="${CUDA_HOME}" \
+        -DCUDA_LIBDIR="${CUDA_HOME}/lib64" \
+        -DCUDA_INCLUDE_DIR="${CUDA_HOME}/include" \
+        -DCUDA_ARCH="${CUDA_ARCH}" \
+        -DCSA_LIBRARY=/opt/csa/lib/libcsa.a \
+        -DCSA_INCLUDE_DIR=/opt/csa/include \
+        -DNN_LIBRARY=/opt/nn/lib/libnn.a \
+        -DNN_INCLUDE_DIR=/opt/nn/include \
+        -DWITH_MMG=TRUE \
+        -DMMG_INCLUDE_DIR=/opt/mmg/include \
+        -DMMG_LIBRARY=/opt/mmg/lib64/libmmg.so \
+        -DMMG_LIBDIR=/opt/mmg/lib64 \
+        -DWITH_PARMMG=TRUE \
+        -DPARMMG_INCLUDE_DIR=/opt/parmmg/include \
+        -DPARMMG_LIBRARY=/opt/parmmg/lib64/libparmmg.so \
+        -DWITH_ElmerIce=TRUE
+
+    cmake --build /opt/src/elmerfem/build --target all -- -j"${JOBS}"
+    cmake --build /opt/src/elmerfem/build --target install -- -j"${JOBS}"
+    rm -rf /opt/src/elmerfem
+    ldconfig
+
+    # Basic smoke checks at build time.
+    /opt/elmer/bin/ElmerSolver -v || true
+    /opt/elmer/bin/ElmerGrid || true
+
+%environment
+    if [ -f /opt/activate.sh ]; then
+        . /opt/activate.sh
+    fi
+
+    CUDA_HOME="${CUDA_HOME:-${CUDA_PATH:-/usr/local/cuda}}"
+    export CUDA_HOME
+    export PATH=/opt/elmer/bin:/opt/gmsh/bin:/opt/parmetis/bin:/opt/metis/bin:/opt/hypre/bin:/opt/nn/bin:/opt/csa/bin:/opt/mmg/bin:/opt/parmmg/bin:/opt/lua/bin:/opt/netcdf/bin:/opt/hdf5/bin:/usr/local/bin:${CUDA_HOME}/bin:$PATH
+    export LD_LIBRARY_PATH=/opt/elmer/lib:/opt/gmsh/lib:/opt/parmetis/lib:/opt/metis/lib:/opt/hypre/lib:/opt/nn/lib:/opt/csa/lib:/opt/mmg/lib64:/opt/mmg/lib:/opt/parmmg/lib64:/opt/parmmg/lib:/opt/amgx/lib:/opt/lua/lib:/opt/netcdf/lib:/opt/hdf5/lib:${CUDA_HOME}/lib64:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/elmer/lib:/opt/gmsh/lib:/opt/parmetis/lib:/opt/metis/lib:/opt/hypre/lib:/opt/nn/lib:/opt/csa/lib:/opt/mmg/lib64:/opt/mmg/lib:/opt/parmmg/lib64:/opt/parmmg/lib:/opt/amgx/lib:/opt/lua/lib:/opt/netcdf/lib:/opt/hdf5/lib:${CUDA_HOME}/lib64:$LIBRARY_PATH
+    export CPATH=/opt/parmetis/include:/opt/metis/include:/opt/hypre/include:/opt/nn/include:/opt/csa/include:/opt/mmg/include:/opt/parmmg/include:/opt/amgx/include:/opt/lua/include:/opt/netcdf/include:/opt/hdf5/include:${CUDA_HOME}/include:$CPATH
+    export CMAKE_PREFIX_PATH=/opt/elmer:/opt/gmsh:/opt/parmetis:/opt/metis:/opt/hypre:/opt/nn:/opt/csa:/opt/mmg:/opt/parmmg:/opt/amgx:/opt/lua:/opt/netcdf:/opt/hdf5:$CMAKE_PREFIX_PATH
+
+%runscript
+    . /opt/activate.sh
+    exec "$@"

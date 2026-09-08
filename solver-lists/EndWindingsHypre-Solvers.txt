@@ -1,0 +1,2 @@
+linsys/hypre_pcg_AMS_smoother0.sif
+linsys/hypre_BiCGStab_BoomerAMG_smoother3.sif
