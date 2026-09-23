@@ -1,0 +1,1 @@
+Navier test case was used to perform measurments on multi-CPU nodes. The folders are named as Navier-WinkelStructured-{Number of partitions}. The tests show that Elmer scales well on multiple nodes, the only exception was going from 1536 -> 3072 partitions (4 -> 8 nodes). 

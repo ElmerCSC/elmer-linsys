@@ -1,0 +1,6 @@
+******: cg + ilu0
+******: cg + ilu0
+******: idrs{5} + ilu0
+******: idrs{5} + ilu0
+******: hypre: bicgstab + parasails
+******: hypre: bicgstab + parasails

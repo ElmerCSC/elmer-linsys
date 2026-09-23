@@ -46,7 +46,8 @@ dat_filename = "f.dat"
 # (in this case WinkelStructed/results)
 org_cwd = os.getcwd()
 cwd_arr = os.getcwd().split('/')
-cwd_arr[-1] = "Poisson/WinkelStructured/results"
+# cwd_arr[-1] = "Poisson/WinkelStructured/results"
+cwd_arr[-1] = "Navier/WinkelStructured/results_amgx"
 os.chdir('/'.join(cwd_arr))
 
 #################################################
@@ -100,7 +101,7 @@ def main():
         if args['save_as'] is not None:
             save_as = args['save_as']
         
-    data = pd.read_table(dat_filename, delim_whitespace=True, header=None)
+    data = pd.read_table(dat_filename,  sep=r"\s+", header=None)
     solvers = read_markers(dat_filename)
 
     column_names = read_names(dat_filename)
@@ -124,14 +125,12 @@ def main():
         data = data[~data['Solver'].isin(remove_solvers)]
         print(f"WARNING: Solver(s): {', '.join(remove_solvers)} had incorrect solution")
 
-    grouped = data.groupby('Solver', group_keys=True).apply(lambda x: x)
-
     successful_solvers = []
     coefs = []
 
     for solver in data['Solver'].values:
 
-        temp = grouped[grouped['Solver'] == solver]
+        temp = data[data['Solver'] == solver]
         
         times = temp[time_col].values
         dofs = temp[dof_col].values #  / 1_000_000  # Unit should be 1M dofs
@@ -156,7 +155,7 @@ def main():
     bars = ax.barh([solver for solver, coef in zipped], [coef for solver, coef in zipped])
     ax.bar_label(bars)
     ax.set_ylabel("Solver")
-    ax.set_xlabel(f"$b$ solved from: $t = a \cdot  n ^ b$")
+    ax.set_xlabel(r"$b$ solved from: $t = a \cdot  n ^ b$")
     ax.set_title(f"Scaling coefs for {'-'.join(os.getcwd().split('/')[-3:-1])} with DOFs {min_dof}-{max_dof} ({data[partition_col].iloc[0]} partitions)")
 
     plt.tight_layout()

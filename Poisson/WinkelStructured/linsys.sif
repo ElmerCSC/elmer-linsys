@@ -12,4 +12,3 @@ $LinStr = "Trilinos: ML{SGS}"
   Linear System Preconditioning = none
 
   Linear System Symmetric = Logical True
-

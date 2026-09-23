@@ -18,7 +18,7 @@ Simulation
   Mesh Levels = $ipar(0)
 
   Simulation Timing = Logical True
-  Post File = "case.vtu"
+!  Post File = "case.vtu"
 End
 
 Constants
@@ -64,7 +64,7 @@ Solver 2
   Equation = SaveTimings
   Procedure = "SaveData" "SaveScalars"
 
-  Filename = f.dat
+  Filename = f$LinMethod$_$ipar(1)$.dat
   Variable 1 = Temperature
   Operator 1 = dofs
   Operator 2 = elements

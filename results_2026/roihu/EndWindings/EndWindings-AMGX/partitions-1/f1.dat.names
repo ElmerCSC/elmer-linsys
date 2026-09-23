@@ -1,0 +1,25 @@
+amgx-gmres
+Metadata for SaveScalars file: results_amgx/f1.dat
+Elmer version: 26.2
+Elmer revision: ec01df878
+Elmer compilation date: 2026-07-31
+Solver input file: case_gpu_490045.sif
+File started at: 2026/08/06 13:23:54
+ 
+Variables in columns of matrix: 
+   1: Line Marker
+   2: dofs: av
+   3: elements: av
+   4: value: number of partitions
+   5: norm: av
+   6: value: cpu time (s)
+   7: simulation: cpu time (s)
+   8: simulation: real time (s)
+   9: res: eddy current power
+  10: res: electromagnetic field energy
+  11: res: total joule heating
+  12: res: linsys cpu time av
+  13: res: linsys real time av
+  14: res: solver cpu time mgdynamics
+  15: res: solver real time mgdynamics
+  16: expression 1
