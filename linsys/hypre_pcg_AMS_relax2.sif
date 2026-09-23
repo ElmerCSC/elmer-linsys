@@ -1,0 +1,21 @@
+$LinMethod = 31700050 
+$LinStr = "Hypre: pcg + ams + relax 2"
+
+  Linear System Use Hypre = True
+
+  Linear System Solver = Iterative
+  Linear System preconditioning = ams
+  Linear System Iterative Method = "pcg"
+  Linear System Max Iterations = 10000
+  Linear System Convergence Tolerance = 1.0E-08
+  Linear System Abort Not Converged = True
+  Linear System Residual Output = 20
+
+  AMS Cycle Type = Integer 1 ! was 0 -- diverged to |B| ~1e3 at both 768 and 1536 ranks, flagged "Kaboom!" in this file already
+  AMS Relax Type = Integer 2
+  AMS Relax Times = Integer 1
+  AMS Relax Weight = Real 1.0
+  AMS Relax Omega = Real 1.0
+  AMS Alpha Threshold = Real 0.30
+  AMS Beta Threshold = Real 0.25
+  AMS Singular Matrix = Logical True

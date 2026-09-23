@@ -1,0 +1,26 @@
+hypre: pcg + ams + smoother 0
+Metadata for SaveScalars file: results_cpu_08_17/f384.dat
+Elmer version: 26.2
+Elmer revision: a19504ac5
+Elmer compilation date: 2026-08-12
+Solver input file: case_cpu_697380.sif
+File started at: 2026/08/18 12:53:32
+ 
+Variables in columns of matrix: 
+   1: Line Marker
+   2: dofs: av : mpi_sum
+   3: elements: av : mpi_sum
+   4: value: number of partitions
+   5: norm: av
+   6: value: cpu time (s)
+   7: simulation: cpu time (s)
+   8: simulation: real time (s)
+   9: res: eddy current power
+  10: res: electromagnetic field energy
+  11: res: total joule heating
+  12: res: linsys cpu time av
+  13: res: linsys real time av
+  14: res: magnetic norm
+  15: res: solver cpu time mgdynamics
+  16: res: solver real time mgdynamics
+  17: expression 1

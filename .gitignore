@@ -1,0 +1,7 @@
+.git
+.venv/
+__pycache__/
+*.pyc
+CLAUDE.md
+raw_results/
+.claude/

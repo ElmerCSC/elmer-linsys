@@ -20,6 +20,14 @@ For those too impatient to do a more rigorous study to find the optimal linear s
 
 ![Decision flowchart](https://github.com/ElmerCSC/elmer-linsys/blob/main/pics/decision_flowchart.png?raw=true)
 
+## Updates in 2026
+
+Most of the test results were done on Mahti. Mahti was replaced by Roihu in 2026 and some new measurments were done for Roihu. These include the Navier problem and the EndWindings Magnetostatics problem. Most of the focus was on testing Elmer solvers on GPUs (AMGX and Hypre), results may be seen here [results_2026/roihu/EndWindings/README.md](results_2026/roihu/EndWindings/README.md). Some multi CPU node measurments were also performed, results may be seen here [results_2026/roihu/Navier/Navier-CPU/README.md](results_2026/roihu/Navier/Navier-CPU/README.md).
+
+A new solver list [solver-lists/GPU-Solvers.txt](solver-lists/GPU-Solvers.txt) has been added, that contains hypre solvers that can be run on the GPUs.
+
+The [vizualize.sh](scripts/vizualize.sh) was added, mainly used for analyzing results on local machine. The scripts in [scripts/roihu](scripts/roihu/) show case how to run AMGX, Hypre GPU or CPU solvers on Roihu. For running the GPU solvers on Roihu, one needs either an Elmer module with GPU support or build their own container. A container that installs Elmer with GPU support can be found [here](https://github.com/cschpc/Elmer-gpu-containers). The scripts should be ran from the root of this repo.
+
 ## License
 
 The contents of this repository are licensed under the Creative Commons Attribution-NonCommercial 4.0 International License. To view a copy of this license, visit <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a> 

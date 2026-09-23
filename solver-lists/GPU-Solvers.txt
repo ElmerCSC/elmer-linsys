@@ -1,0 +1,4 @@
+linsys/hypre_pcg_AMS_relax2.sif
+linsys/hypre_BiCGStab_BoomerAMG_gpu.sif
+linsysAMGX/amgx_bicgstab_none.sif
+linsysAMGX/amgx_cg_none.sif

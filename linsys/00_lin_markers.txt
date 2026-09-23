@@ -47,6 +47,7 @@ Solvers/iterative methods:
     Idrs = 14
     Tfqmr = 15
     Block_Jacobi = 16
+    PCG = 17
     
 ----------------------------------------------------------
 
@@ -63,6 +64,7 @@ Preconditioning:
     BoomerAMG = 7  // AMG
     Parasails = 8
     CMG_SGS = 9
+    AMS = 0 // there is only one solver using AMS currently, 0 reused for AMS
 ----------------------------------------------------------
 
 ----------------------------------------------------------

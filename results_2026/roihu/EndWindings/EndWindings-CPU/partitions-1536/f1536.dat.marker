@@ -1,0 +1,3 @@
+******: hypre: pcg + ams + smoother 0
+******: hypre: bicgstab + boomeramg + smoother 3
+******: hypre: pcg + ams + smoother 0

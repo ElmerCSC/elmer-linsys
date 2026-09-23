@@ -1,0 +1,12 @@
+******: bicgstab + none
+******: cg + none
+******: hypre: bicgstab + none
+******: hypre: pcg + ams + smoother 0
+******: bicgstab + none
+******: cg + none
+******: hypre: bicgstab + none
+******: hypre: pcg + ams + smoother 0
+******: bicgstab + none
+******: cg + none
+******: hypre: bicgstab + none
+******: hypre: pcg + ams + smoother 0
