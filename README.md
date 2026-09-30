@@ -22,11 +22,20 @@ For those too impatient to do a more rigorous study to find the optimal linear s
 
 ## Updates in 2026
 
+#### Benchmarks results
 Most of the test results were done on Mahti. Mahti was replaced by Roihu in 2026 and some new measurments were done for Roihu. These include the Navier problem and the EndWindings Magnetostatics problem. Most of the focus was on testing Elmer solvers on GPUs (AMGX and Hypre), results may be seen here [results_2026/roihu/EndWindings/README.md](results_2026/roihu/EndWindings/README.md). Some multi CPU node measurments were also performed, results may be seen here [results_2026/roihu/Navier/Navier-CPU/README.md](results_2026/roihu/Navier/Navier-CPU/README.md).
 
-A new solver list [solver-lists/GPU-Solvers.txt](solver-lists/GPU-Solvers.txt) has been added, that contains hypre solvers that can be run on the GPUs.
+A new solver list [solver-lists/GPU-Solvers.txt](solver-lists/GPU-Solvers.txt) has been added, that contains iterative hypre solvers that can be run on the GPUs. 
 
-The [vizualize.sh](scripts/vizualize.sh) was added, mainly used for analyzing results on local machine. The scripts in [scripts/roihu](scripts/roihu/) show case how to run AMGX, Hypre GPU or CPU solvers on Roihu. For running the GPU solvers on Roihu, one needs either an Elmer module with GPU support or build their own container. A container that installs Elmer with GPU support can be found [here](https://github.com/cschpc/Elmer-gpu-containers). The scripts should be ran from the root of this repo.
+#### Vector Helmholtz + GPUs
+Additional solver lists [solver-lists/Direct-Solvers.txt](solver-lists/Direct-Solvers.txt) (CPU) and [solver-lists/DirectGPU-Solvers.txt](solver-lists/DirectGPU-Solvers.txt) were added for testing the vector Helmholtz problem. 
+
+#### General info
+The scripts in [scripts/roihu](scripts/roihu/) show case how to run AMGX, Hypre GPU, CPU solvers on Roihu. The scripts `run_cpu_vector_helmholtz.sh` and `run_gpu_vector_helmholtz.sh` allow for quick testing of the vector Helmholtz problem. For running the GPU solvers on Roihu, one needs either an Elmer module with GPU support or build their own container (the provided GPU scripts require a container). Containers that install Elmer with GPU support can be found [here](https://github.com/cschpc/Elmer-gpu-containers). 
+
+The scripts should be ran from the root of this repo.
+
+The [vizualize.sh](scripts/vizualize.sh) was added, mainly used for analyzing results on local machine.
 
 ## License
 

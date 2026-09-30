@@ -1,0 +1,6 @@
+$LinMethod = 10300000
+$LinStr = "cuDSS"
+
+    Linear System Solver = "Direct"
+    Linear System Direct Method = "cudss"
+    Linear System Symmetric = True

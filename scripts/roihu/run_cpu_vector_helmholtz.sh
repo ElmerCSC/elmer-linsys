@@ -1,12 +1,12 @@
 #!/bin/bash 
-#SBATCH --time=00:30:00
-#SBATCH --job-name=cpu_ew_mesh_2
+#SBATCH --time=00:15:00
+#SBATCH --job-name=cpu_helmhlotz_direct
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
-#SBATCH --partition=medium
+#SBATCH --partition=test
 #SBATCH --account=project_2001659
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=32
+#SBATCH --ntasks-per-node=64
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=0
 
@@ -14,23 +14,37 @@ set -euo pipefail
 
 module load elmerfem
 
+# More threads don't really increase performance
 export OMP_NUM_THREADS=72
 
-
 # Define the path to the case folder
-path=Magnetostatics/EndWindings
+path=VectorHelmholtz/BandpassFilterTets-cpu
 
 # Define the problem type
-problem=EndWindingsCPU
+problem=Direct
 
 # Define the number of partitions (should be nodes * ntasks-per-node)
 partitions=$SLURM_NTASKS
 threads=$SLURM_CPUS_PER_TASK
 
-sif_basename=hierarc.sif
-RESULTS_DIR=results_cpu
+RESULTS_DIR=results
 
 
+
+# Job-specific filenames so a concurrently-running job that shares this same
+# case directory (e.g. the CPU sweep) can't clobber this job's linsys.sif /
+# config.json / case file while both are in flight.
+sif_basename=Filter_Zhai.sif
+
+
+
+# Remove the result files if they already exist
+# rm -f $path/results_amgx/f$result_file.*
+
+# Copy the valid case file into the case.sif file
+# This can be commented out if there is only a single
+# default case file in the folder
+# cp $path/case_amgx.sif $path/case.sif
 
 # Job-specific filenames so a concurrently-running job that shares this same
 # case directory (e.g. the CPU sweep) can't clobber this job's linsys.sif /
@@ -38,18 +52,19 @@ RESULTS_DIR=results_cpu
 ORG_DIR=$PWD
 JOB_TAG=${SLURM_JOB_ID:-$$}
 LINSYS_FILE=linsys_$JOB_TAG.sif
-CASE_FILE=case_cpu_$JOB_TAG.sif
-
-
+CONFIG_FILE=config_$JOB_TAG.json
+CASE_FILE=case_$JOB_TAG.sif
 
 
 cd $path
 
-ElmerGrid 2 2 ./mesh -partdual -metiskway $partitions
+# -n1: ElmerGrid itself isn't MPI-parallel
+# ElmerGrid 1 2 winkel.grd -partdual -metiskway $partitions
+ElmerGrid 2 2 Hl_Filter_Zhai_a08 -partdual -metiskway $partitions
 
 cd ../..
 
-for mesh_level in 2; do
+
     for solver in linsys/*.sif; do
 	if grep -Fxq "$solver" solver-lists/$problem-Solvers.txt
 	then
@@ -63,27 +78,27 @@ for mesh_level in 2; do
         start=$(date +%s)
 
         echo "-----------------------------------"
-        echo "Starting $solver with mesh level $mesh_level"
+        echo "Starting $solver with mesh level"
+        echo
 
-        srun --cpus-per-task=$threads ElmerSolver $CASE_FILE -ipar 2 $mesh_level $partitions
+        srun --cpus-per-task=$threads ElmerSolver $CASE_FILE
 
         end=$(date +%s)
 
-
-        echo "Ending $solver with mesh level $mesh_level"
         echo "Elapsed time: $(($end-$start)) s"
         echo "-----------------------------------"
 
-	    cd ../..
-
+        cd ../..
 	else
 	    echo
 	    echo "Solver $solver not recommended for given problem. Ignoring it"
 	    echo
 	fi
     
-   done
+    done
+    
 
-    echo "Finished all solvers for mesh level $mesh_level"
-    rm -rf $path/$LINSYS_FILE $path/$CONFIG_FILE $path/$CASE_FILE
-done
+   echo "Finished all solvers"
+
+
+
