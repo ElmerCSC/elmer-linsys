@@ -1,11 +1,8 @@
 Header
   CHECK KEYWORDS Warn
-  Mesh DB "mesh" "Hl_Filter_Zhai_a08"
-! This is an alternative mesh
-! >ElmerGrid 1 2 filter.grd
-! Mesh DB "." "filter"
+  Mesh DB "." "filter"
   Include Path ""
-  Results Directory "res"
+  Results Directory "results"
 End
 
 !$te = 151
@@ -43,6 +40,10 @@ $ te = 1 !151
   Filter a = Real $25.4e-03*0.28
 
   Wave Length = Real 1.0e-8
+
+  Simulation Timing = Logical True
+
+  Mesh Levels = $ipar(0)
 End
 
 Constants
@@ -73,6 +74,9 @@ Solver 1
   include linsys.sif
 
   Linear System Convergence Tolerance = 1.0e-7
+
+  Linear System Timing = True
+  Solver Timing = True
 End
 
 Solver 2
@@ -90,10 +94,30 @@ Solver 2
 End
 
 Solver 3
-  Filename = "f1.dat"
-  Exec Solver = after timestep
-  Equation = SaveScalars
+  Equation = SaveTimings
   Procedure = "SaveData" "SaveScalars"
+
+  Filename = f$ipar(1)$.dat
+  Variable 1 = E
+  Operator 1 = dofs
+  Operator 2 = elements
+  Operator 3 = partitions
+  Operator 4 = norm
+  Operator 5 = cpu time
+
+  Expression 1 = Real $ipar(0)
+
+! Give a unique tag to each line/method
+  Line Marker = Integer $LinMethod$
+
+! We write a separate file showing how marker is mapped to string of the method
+  Comment = String $LinStr$
+
+! add the number of partitions to the filename
+!  Partition Numbering = Logical True
+
+  File Append = True
+  Parallel Reduce = True
 End
 
 Solver 4
